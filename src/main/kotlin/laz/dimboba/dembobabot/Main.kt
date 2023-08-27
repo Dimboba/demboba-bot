@@ -33,7 +33,6 @@ suspend fun main(args: Array<String>){
         if (message.author?.isBot != false) return@on
 
         try {
-            //TODO: переделать в просто handle message
             messageEventHandler.handleMessage(message)
         } catch (ex: UnknownCommandException) {
             message.channel.createMessage(

@@ -7,10 +7,9 @@ import laz.dimboba.dembobabot.exceptions.UnknownCommandException
 import java.text.SimpleDateFormat
 import java.util.*
 
-const val commandChar: Char = '!'
 
 class MessageEventHandler {
-
+    private val commandChar: Char = '!'
     private var currMessage: Message? = null
     suspend fun handleMessage(message: Message) {
 
