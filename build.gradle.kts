@@ -1,5 +1,7 @@
 plugins {
     kotlin("jvm") version "1.9.0"
+
+    application
 }
 
 group = "laz.dimboba"
@@ -18,9 +20,15 @@ dependencies {
     implementation("dev.kord:kord-voice:0.10.0")
 }
 
+application {
+    mainClass.set("laz.dimboba.dembobabot.MainKt")
+}
+
 tasks.test {
     useJUnitPlatform()
 }
+
+
 
 kotlin {
     jvmToolchain(8)
