@@ -1,5 +1,7 @@
-import exceptions.NotABattleTagException
-import exceptions.ParsingHTMLException
+package laz.dimboba.dembobabot
+
+import laz.dimboba.dembobabot.exceptions.NotABattleTagException
+import laz.dimboba.dembobabot.exceptions.ParsingHTMLException
 import org.jsoup.Jsoup
 import java.util.*
 

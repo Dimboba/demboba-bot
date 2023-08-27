@@ -1,11 +1,12 @@
+package laz.dimboba.dembobabot
+
 import dev.kord.core.Kord
 import dev.kord.core.event.message.MessageCreateEvent
 import dev.kord.core.on
 import dev.kord.gateway.Intent
 import dev.kord.gateway.PrivilegedIntent
-import exceptions.NotACommandMessageException
-import exceptions.UnknownCommandException
-import kotlinx.coroutines.flow.first
+import laz.dimboba.dembobabot.exceptions.NotACommandMessageException
+import laz.dimboba.dembobabot.exceptions.UnknownCommandException
 
 suspend fun main(args: Array<String>){
 

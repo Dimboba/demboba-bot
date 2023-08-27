@@ -1,3 +1,5 @@
+package laz.dimboba.dembobabot
+
 data class OverwatchPlayerStats(
     val gameMode: String = "All",
     val name: String,

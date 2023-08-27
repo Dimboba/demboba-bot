@@ -1,7 +1,9 @@
+package laz.dimboba.dembobabot
+
 import dev.kord.core.entity.Message
-import exceptions.NotACommandMessageException
-import exceptions.NotEnoughArgumentsException
-import exceptions.UnknownCommandException
+import laz.dimboba.dembobabot.exceptions.NotACommandMessageException
+import laz.dimboba.dembobabot.exceptions.NotEnoughArgumentsException
+import laz.dimboba.dembobabot.exceptions.UnknownCommandException
 import java.text.SimpleDateFormat
 import java.util.*
 
