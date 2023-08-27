@@ -15,7 +15,7 @@ suspend fun main(args: Array<String>){
     println(token)
 
     val kord = Kord(token)
-
+    val messageEventHandler = MessageEventHandler()
     //получение каналов и групп каналов
 //    kord.guilds.first().channels.collect{
 //        channel -> println(channel.name + "  " + channel.type)
@@ -34,9 +34,7 @@ suspend fun main(args: Array<String>){
 
         try {
             //TODO: переделать в просто handle message
-            message.channel.createMessage(
-                handleMessage(message)
-            )
+            messageEventHandler.handleMessage(message)
         } catch (ex: UnknownCommandException) {
             message.channel.createMessage(
                 "В Политехе такому не учили :<"
