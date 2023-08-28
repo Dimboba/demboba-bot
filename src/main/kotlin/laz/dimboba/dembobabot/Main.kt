@@ -7,6 +7,8 @@ import dev.kord.gateway.Intent
 import dev.kord.gateway.PrivilegedIntent
 import laz.dimboba.dembobabot.exceptions.NotACommandMessageException
 import laz.dimboba.dembobabot.exceptions.UnknownCommandException
+import laz.dimboba.dembobabot.voice.MusicPlayer
+import laz.dimboba.dembobabot.voice.VoiceConnectionsHandler
 
 suspend fun main(args: Array<String>){
 
