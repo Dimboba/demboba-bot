@@ -12,10 +12,10 @@ suspend fun main(args: Array<String>){
 
     val token: String = System.getenv("discord_token") ?: "null-token"
 
-    println(token)
-
     val kord = Kord(token)
-    val messageEventHandler = MessageEventHandler()
+    val voiceConnectionsHandler = VoiceConnectionsHandler()
+    val musicPlayer = MusicPlayer(voiceConnectionsHandler)
+    val messageEventHandler = MessageEventHandler(musicPlayer)
     //получение каналов и групп каналов
 //    kord.guilds.first().channels.collect{
 //        channel -> println(channel.name + "  " + channel.type)
@@ -32,8 +32,10 @@ suspend fun main(args: Array<String>){
         // ignore other bots, even ourselves. We only serve humans here!
         if (message.author?.isBot != false) return@on
 
+        println(message.content)
+
         try {
-            messageEventHandler.handleMessage(message)
+            messageEventHandler.handleMessage(this)
         } catch (ex: UnknownCommandException) {
             message.channel.createMessage(
                 "В Политехе такому не учили :<"
@@ -42,6 +44,7 @@ suspend fun main(args: Array<String>){
         } catch (_: NotACommandMessageException) {
             return@on
         }
+
     }
 
 
@@ -54,6 +57,8 @@ suspend fun main(args: Array<String>){
         @OptIn(PrivilegedIntent::class)
         intents += Intent.MessageContent
 
+        @OptIn(PrivilegedIntent::class)
+        intents += Intent.GuildVoiceStates
     }
 }
 
