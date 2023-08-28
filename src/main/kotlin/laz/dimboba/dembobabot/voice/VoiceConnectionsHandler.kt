@@ -1,10 +1,8 @@
-package laz.dimboba.dembobabot
+package laz.dimboba.dembobabot.voice
 
 import dev.kord.common.annotation.KordVoice
 import dev.kord.common.entity.Snowflake
 import dev.kord.core.behavior.channel.BaseVoiceChannelBehavior
-import dev.kord.core.behavior.channel.ChannelBehavior
-import dev.kord.core.behavior.channel.VoiceChannelBehavior
 import dev.kord.core.behavior.channel.connect
 import dev.kord.voice.VoiceConnection
 import dev.kord.voice.VoiceConnectionBuilder

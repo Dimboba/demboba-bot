@@ -1,4 +1,4 @@
-package laz.dimboba.dembobabot
+package laz.dimboba.dembobabot.voice
 
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer
@@ -8,15 +8,15 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack
 import dev.kord.common.annotation.KordVoice
-import dev.kord.common.entity.Snowflake
 import dev.kord.core.behavior.channel.BaseVoiceChannelBehavior
-import dev.kord.core.behavior.reply
 import dev.kord.core.entity.Message
 import dev.kord.voice.AudioFrame
-import dev.kord.voice.VoiceConnection
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
+//TODO: leave if there is no songs
+//TODO: create query for songs (like !next)
+//TODO: url for songs
 class MusicPlayer (
     private val voiceConnectionsHandler: VoiceConnectionsHandler
 ) {
@@ -48,7 +48,8 @@ class MusicPlayer (
             }
         }
 
-        return track.info.title
+
+        return track.info.uri
     }
 
     suspend fun stopSong(message: Message) {

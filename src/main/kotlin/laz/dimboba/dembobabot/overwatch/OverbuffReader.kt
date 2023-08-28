@@ -1,4 +1,4 @@
-package laz.dimboba.dembobabot
+package laz.dimboba.dembobabot.overwatch
 
 import laz.dimboba.dembobabot.exceptions.NotABattleTagException
 import laz.dimboba.dembobabot.exceptions.ParsingHTMLException
