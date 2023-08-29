@@ -15,6 +15,8 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
+//TODO: ErrorHandler
+
 class MessageEventHandler(
     private val musicPlayer: MusicPlayer
 ) {
@@ -38,7 +40,7 @@ class MessageEventHandler(
         if (keyword.length < 2 || keyword[0] != commandChar)
             throw NotACommandMessageException("Message: \"$text\" is not a command")
 
-        //TODO: вероятно, лучше по ключу в мапке передавать функцию что делать
+        //TODO: nicknames to battle tag from json through map for best pies on server
 
         when (val command = keyword.substring(1, keyword.length).lowercase(Locale.getDefault())) {
             "ping" -> sendMessage("pong!")

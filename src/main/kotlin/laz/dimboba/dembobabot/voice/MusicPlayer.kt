@@ -39,13 +39,19 @@ class MusicPlayer (
         val track = lavaplayerManager.playTrack(query, player)
 
         voiceConnectionsHandler.closeConnections(message.getGuild().id)
-        voiceConnectionsHandler.connect(
-            channelBehavior = channel,
-            guildId = message.getGuild().id
-        ) {
-            audioProvider {
-                AudioFrame.fromData(player.provide().data)
+
+        try {
+            voiceConnectionsHandler.connect(
+                channelBehavior = channel,
+                guildId = message.getGuild().id
+            ) {
+                audioProvider {
+                    AudioFrame.fromData(player.provide().data)
+                }
             }
+        } catch (ex: Exception) {
+            //TODO: refactor, just for test
+            throw Exception(ex.localizedMessage)
         }
 
 
@@ -65,6 +71,7 @@ class MusicPlayer (
                     it.resume(track)
                 }
 
+                //TODO: check if going through playlist
                 override fun playlistLoaded(playlist: AudioPlaylist) {
                     it.resume(playlist.tracks.first())
                 }
