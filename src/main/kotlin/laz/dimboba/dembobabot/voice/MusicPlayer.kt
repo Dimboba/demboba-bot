@@ -1,7 +1,6 @@
 package laz.dimboba.dembobabot.voice
 
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayer
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException
@@ -16,16 +15,20 @@ import kotlin.coroutines.suspendCoroutine
 
 //TODO: leave if there is no songs
 //TODO: create query for songs (like !next)
-//TODO: url for songs
+//TODO: url for songs (kill channel url at the end)
 class MusicPlayer (
     private val voiceConnectionsHandler: VoiceConnectionsHandler
 ) {
     private val lavaplayerManager = DefaultAudioPlayerManager()
+    init {
+        //lavaplayerManager.registerSourceManager(YoutubeAudioSourceManager())
+        AudioSourceManagers.registerRemoteSources(lavaplayerManager)
+    }
 
     private val player = lavaplayerManager.createPlayer()
-
+    private val trackScheduler = TrackScheduler(player, voiceConnectionsHandler)
     init {
-        AudioSourceManagers.registerRemoteSources(lavaplayerManager)
+        player.addListener(trackScheduler)
     }
 
     @OptIn(KordVoice::class)
@@ -34,13 +37,19 @@ class MusicPlayer (
         message: Message,
         searchString: String): String {
 
+        if(searchString.contains("www.youtube.com") || searchString.startsWith("https://youtu.be")
+            && searchString.contains("&")) {
+            val suffix = searchString.subSequence(searchString.indexOf("&"), searchString.length - 1)
+            searchString.removeSuffix(suffix)
+        }
+
         val query = "ytsearch: $searchString"
 
-        val track = lavaplayerManager.playTrack(query, player)
+        val track = lavaplayerManager.loadTrack(query)
 
-        voiceConnectionsHandler.closeConnections(message.getGuild().id)
-
-        try {
+        try{
+            println("connecting")
+            voiceConnectionsHandler.closeConnections(message.getGuild().id)
             voiceConnectionsHandler.connect(
                 channelBehavior = channel,
                 guildId = message.getGuild().id
@@ -49,8 +58,10 @@ class MusicPlayer (
                     AudioFrame.fromData(player.provide().data)
                 }
             }
+            println("connected")
         } catch (ex: Exception) {
             //TODO: refactor, just for test
+            println("error while voice connecting")
             throw Exception(ex.localizedMessage)
         }
 
@@ -64,17 +75,23 @@ class MusicPlayer (
     }
 
 
-    private suspend fun DefaultAudioPlayerManager.playTrack(query: String, player: AudioPlayer): AudioTrack {
+    private suspend fun DefaultAudioPlayerManager.loadTrack(query: String): AudioTrack {
         val track = suspendCoroutine<AudioTrack> {
             this.loadItem(query, object : AudioLoadResultHandler {
                 override fun trackLoaded(track: AudioTrack) {
+                    trackScheduler.queue(track)
                     it.resume(track)
                 }
 
-                //TODO: check if going through playlist
                 override fun playlistLoaded(playlist: AudioPlaylist) {
-                    it.resume(playlist.tracks.first())
+//                    for (track in playlist.tracks) {
+//                        trackScheduler.queue(track!!)
+//                    }
+                    trackScheduler.queue(playlist.tracks[0])
+                    it.resume(playlist.tracks[0])
+
                 }
+
 
                 override fun noMatches() {
                     //TODO()
@@ -87,7 +104,6 @@ class MusicPlayer (
         }
 
         player.playTrack(track)
-
         return track
     }
 }

@@ -7,6 +7,8 @@ import dev.kord.core.behavior.channel.connect
 import dev.kord.voice.VoiceConnection
 import dev.kord.voice.VoiceConnectionBuilder
 
+//TODO: check if channel is empty
+
 class VoiceConnectionsHandler {
     @OptIn(KordVoice::class)
     private val connections: MutableMap<Snowflake, VoiceConnection> = mutableMapOf()
