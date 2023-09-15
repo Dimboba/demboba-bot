@@ -9,6 +9,7 @@ import dev.kord.core.behavior.channel.BaseVoiceChannelBehavior
 import dev.kord.core.behavior.channel.ChannelBehavior
 import dev.kord.core.behavior.channel.MessageChannelBehavior
 import dev.kord.core.behavior.reply
+import dev.kord.core.entity.Guild
 import dev.kord.core.entity.Message
 import dev.kord.core.entity.channel.MessageChannel
 import dev.kord.voice.AudioFrame
@@ -22,7 +23,7 @@ class TrackScheduler(
 
     private val audioTrackQueue = ArrayList<AudioTrack>()
     private var messageChannel: MessageChannelBehavior? = null
-
+    private var voiceGuild: Guild? = null
     fun queue(track: AudioTrack){
         //println("add track: ${track.info.title}" )
         audioTrackQueue.add(track)
@@ -37,6 +38,7 @@ class TrackScheduler(
     suspend fun play(message: Message, channel: BaseVoiceChannelBehavior){
         if(voiceConnectionsHandler.isConnected(message.getGuild().id))
             return
+        voiceGuild = message.getGuild()
         messageChannel = message.channel
         player.playTrack(audioTrackQueue.removeFirst())
         try{
@@ -84,6 +86,7 @@ class TrackScheduler(
     private fun onTrackEnd(player: AudioPlayer){
         if(audioTrackQueue.isEmpty()){
             runBlocking {
+                voiceGuild?.id?.let { voiceConnectionsHandler.closeConnections(it) }
                 messageChannel?.createMessage(
                     "Queue is empty"
                 )
