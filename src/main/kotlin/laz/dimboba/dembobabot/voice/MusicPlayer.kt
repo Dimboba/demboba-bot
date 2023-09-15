@@ -38,12 +38,12 @@ class MusicPlayer (
         searchString: String) {
         val search = searchString.trimStart()
         val query: String = if(search.startsWith("https://www.youtube.com") || search.startsWith("https://youtu.be")) {
-            println("in if")
-            if(search.contains("&")) {
-                val suffix = search.subSequence(search.indexOf("&"), search.length - 1)
-                search.removeSuffix(suffix)
+            val suffix = if(search.contains("&")) {
+                search.subSequence(search.indexOf("&"), search.length)
+            } else {
+                ""
             }
-            search
+            search.removeSuffix(suffix)
         } else {
             "ytsearch: $search"
         }
