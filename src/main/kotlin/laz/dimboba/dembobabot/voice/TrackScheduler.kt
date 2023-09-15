@@ -7,9 +7,12 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack
 import dev.kord.common.annotation.KordVoice
 import dev.kord.core.behavior.channel.BaseVoiceChannelBehavior
 import dev.kord.core.behavior.channel.ChannelBehavior
+import dev.kord.core.behavior.channel.MessageChannelBehavior
 import dev.kord.core.behavior.reply
 import dev.kord.core.entity.Message
+import dev.kord.core.entity.channel.MessageChannel
 import dev.kord.voice.AudioFrame
+import kotlinx.coroutines.runBlocking
 
 class TrackScheduler(
     private val player: AudioPlayer,
@@ -18,6 +21,7 @@ class TrackScheduler(
 ): AudioEventListener {
 
     private val audioTrackQueue = ArrayList<AudioTrack>()
+    private var messageChannel: MessageChannelBehavior? = null
 
     fun queue(track: AudioTrack){
         //println("add track: ${track.info.title}" )
@@ -33,9 +37,8 @@ class TrackScheduler(
     suspend fun play(message: Message, channel: BaseVoiceChannelBehavior){
         if(voiceConnectionsHandler.isConnected(message.getGuild().id))
             return
-        player.playTrack(audioTrackQueue.first())
-        println(player.playingTrack.info.title)
-        audioTrackQueue.removeFirst()
+        messageChannel = message.channel
+        player.playTrack(audioTrackQueue.removeFirst())
         try{
             println("connecting")
             voiceConnectionsHandler.closeConnections(message.getGuild().id)
@@ -72,10 +75,22 @@ class TrackScheduler(
 
     }
     private fun onTrackStart(player: AudioPlayer){
-
+        runBlocking {
+            messageChannel?.createMessage(
+                "Playing track: ${player.playingTrack.info.title}"
+            )
+        }
     }
     private fun onTrackEnd(player: AudioPlayer){
-
+        if(audioTrackQueue.isEmpty()){
+            runBlocking {
+                messageChannel?.createMessage(
+                    "Queue is empty"
+                )
+            }
+            return
+        }
+        player.playTrack(audioTrackQueue.removeFirst())
     }
     private fun onTrackException(player: AudioPlayer){
 

@@ -14,8 +14,9 @@ import dev.kord.voice.AudioFrame
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-//TODO: leave if there is no songs
+//TODO: leave if there is no songs (occurs bugs)
 //TODO: create query for songs (like !next)
+
 class MusicPlayer (
     private val voiceConnectionsHandler: VoiceConnectionsHandler
 ) {
