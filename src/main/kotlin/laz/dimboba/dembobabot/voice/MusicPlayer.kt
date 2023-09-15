@@ -58,7 +58,7 @@ class MusicPlayer (
 
     suspend fun leave(message: Message) {
         voiceConnectionsHandler.closeConnections(message.getGuild().id)
-
+        trackScheduler.emptyQueue()
         message.reply {
             content = "Music player is shutdown"
         }

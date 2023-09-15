@@ -30,6 +30,10 @@ class TrackScheduler(
 
     }
 
+    fun emptyQueue() {
+        audioTrackQueue.clear()
+    }
+
     fun queueList(playlist: AudioPlaylist) {
         playlist.tracks.forEach { track -> audioTrackQueue.add(track) }
     }
