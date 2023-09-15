@@ -49,7 +49,7 @@ class MessageEventHandler(
             "fuckyou", "fuck", "fu", "fyou", "fucku" -> reply("Fuck off, ${getName(message)}")
             "overwatch" -> sendMessage(getAllStats(text))
             "play" -> playMusic(text, messageCreateEvent.member, message)
-            "stop" -> stopMusic(message)
+            "leave" -> leave(message)
 
             else -> throw UnknownCommandException("Unknown command: \"$command\"")
         }
@@ -71,12 +71,8 @@ class MessageEventHandler(
         return sdf.format(currDate)
     }
 
-    private suspend fun stopMusic(message: Message) {
-        musicPlayer.stopSong(message)
-
-        message.reply {
-            content = "Music is stopped"
-        }
+    private suspend fun leave(message: Message) {
+        musicPlayer.leave(message)
     }
 
     //parsed string below
@@ -87,15 +83,10 @@ class MessageEventHandler(
             ?: throw CannotFindMemberException("There is no such member")
 
 
-        val title = musicPlayer.playYTSong(
+        musicPlayer.playYTSong(
             channel,
             message,
             message.content.removePrefix(commandChar + "play"))
-
-
-        message.reply {
-            content = "Playing track: $title"
-        }
 
     }
 
