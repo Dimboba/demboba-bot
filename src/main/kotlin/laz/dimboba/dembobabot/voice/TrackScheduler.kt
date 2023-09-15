@@ -47,7 +47,7 @@ class TrackScheduler(
                 guildId = message.getGuild().id
             ) {
                 audioProvider {
-                    AudioFrame.fromData(player.provide().data)
+                    AudioFrame.fromData(player.provide()?.data)
                 }
             }
             println("connected")
