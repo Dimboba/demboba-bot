@@ -8,6 +8,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack
 import dev.kord.common.annotation.KordVoice
 import dev.kord.core.behavior.channel.BaseVoiceChannelBehavior
+import dev.kord.core.behavior.reply
 import dev.kord.core.entity.Message
 import dev.kord.voice.AudioFrame
 import kotlin.coroutines.resume
@@ -15,7 +16,6 @@ import kotlin.coroutines.suspendCoroutine
 
 //TODO: leave if there is no songs
 //TODO: create query for songs (like !next)
-//TODO: url for songs (kill channel url at the end)
 class MusicPlayer (
     private val voiceConnectionsHandler: VoiceConnectionsHandler
 ) {
@@ -31,80 +31,66 @@ class MusicPlayer (
         player.addListener(trackScheduler)
     }
 
-    @OptIn(KordVoice::class)
     suspend fun playYTSong(
         channel: BaseVoiceChannelBehavior,
         message: Message,
-        searchString: String): String {
-
-        if(searchString.contains("www.youtube.com") || searchString.startsWith("https://youtu.be")
-            && searchString.contains("&")) {
-            val suffix = searchString.subSequence(searchString.indexOf("&"), searchString.length - 1)
-            searchString.removeSuffix(suffix)
-        }
-
-        val query = "ytsearch: $searchString"
-
-        val track = lavaplayerManager.loadTrack(query)
-
-        try{
-            println("connecting")
-            voiceConnectionsHandler.closeConnections(message.getGuild().id)
-            voiceConnectionsHandler.connect(
-                channelBehavior = channel,
-                guildId = message.getGuild().id
-            ) {
-                audioProvider {
-                    AudioFrame.fromData(player.provide().data)
-                }
+        searchString: String) {
+        val search = searchString.trimStart()
+        val query: String = if(search.startsWith("https://www.youtube.com") || search.startsWith("https://youtu.be")) {
+            println("in if")
+            if(search.contains("&")) {
+                val suffix = search.subSequence(search.indexOf("&"), search.length - 1)
+                search.removeSuffix(suffix)
             }
-            println("connected")
-        } catch (ex: Exception) {
-            //TODO: refactor, just for test
-            println("error while voice connecting")
-            throw Exception(ex.localizedMessage)
+            search
+        } else {
+            "ytsearch: $search"
         }
-
-
-        return track.info.uri
+        println(query)
+        lavaplayerManager.loadTrack(query, message)
+        trackScheduler.play(message, channel)
     }
 
-    suspend fun stopSong(message: Message) {
+    suspend fun stop(message: Message) {
+
+    }
+
+    suspend fun leave(message: Message) {
         voiceConnectionsHandler.closeConnections(message.getGuild().id)
 
+        message.reply {
+            content = "Music player is shutdown"
+        }
     }
 
 
-    private suspend fun DefaultAudioPlayerManager.loadTrack(query: String): AudioTrack {
-        val track = suspendCoroutine<AudioTrack> {
+    private suspend fun DefaultAudioPlayerManager.loadTrack(query: String, message: Message) {
+        val messageContent = suspendCoroutine<String> {
             this.loadItem(query, object : AudioLoadResultHandler {
                 override fun trackLoaded(track: AudioTrack) {
                     trackScheduler.queue(track)
-                    it.resume(track)
+                    it.resume("Add track: ${track.info.title}")
                 }
 
                 override fun playlistLoaded(playlist: AudioPlaylist) {
-//                    for (track in playlist.tracks) {
-//                        trackScheduler.queue(track!!)
-//                    }
-                    trackScheduler.queue(playlist.tracks[0])
-                    it.resume(playlist.tracks[0])
-
+                    trackScheduler.queueList(playlist)
+                    it.resume("Add ${playlist.tracks.size} tracks from ${playlist.name}")
                 }
 
 
                 override fun noMatches() {
-                    //TODO()
+                    it.resume("There is no such tracks")
                 }
 
                 override fun loadFailed(exception: FriendlyException?) {
-                    //TODO()
+                    it.resume("An error occurred")
                 }
             })
         }
 
-        player.playTrack(track)
-        return track
+        message.reply {
+            content = messageContent
+        }
     }
 }
 

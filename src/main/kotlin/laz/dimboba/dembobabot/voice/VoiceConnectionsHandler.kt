@@ -30,4 +30,9 @@ class VoiceConnectionsHandler {
         connections[guildId] = connection
         return connection
     }
+
+    @OptIn(KordVoice::class)
+    fun isConnected(
+        guildId: Snowflake
+    ) = connections.keys.contains(guildId)
 }
