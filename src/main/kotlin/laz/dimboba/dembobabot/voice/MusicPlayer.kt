@@ -36,8 +36,11 @@ class MusicPlayer (
         channel: BaseVoiceChannelBehavior,
         message: Message,
         searchString: String) {
+        var isSearch = false
         val search = searchString.trimStart()
-        val query: String = if(search.startsWith("https://www.youtube.com") || search.startsWith("https://youtu.be")) {
+        val query: String = if(search.startsWith("https://www.youtube.com")
+            || search.startsWith("https://youtu.be")
+            || search.startsWith("https://youtube.com")) {
             val suffix = if(search.contains("&")) {
                 search.subSequence(search.indexOf("&"), search.length)
             } else {
@@ -45,10 +48,11 @@ class MusicPlayer (
             }
             search.removeSuffix(suffix)
         } else {
+            isSearch = true
             "ytsearch: $search"
         }
         println(query)
-        lavaplayerManager.loadTrack(query, message)
+        lavaplayerManager.loadTrack(query, message, isSearch)
         trackScheduler.play(message, channel)
     }
 
@@ -65,7 +69,10 @@ class MusicPlayer (
     }
 
 
-    private suspend fun DefaultAudioPlayerManager.loadTrack(query: String, message: Message) {
+    private suspend fun DefaultAudioPlayerManager.loadTrack(
+        query: String,
+        message: Message,
+        isSearch: Boolean = false) {
         val messageContent = suspendCoroutine<String> {
             this.loadItem(query, object : AudioLoadResultHandler {
                 override fun trackLoaded(track: AudioTrack) {
@@ -74,6 +81,10 @@ class MusicPlayer (
                 }
 
                 override fun playlistLoaded(playlist: AudioPlaylist) {
+                    if(isSearch){
+                        trackScheduler.queue(playlist.tracks.first())
+                        it.resume("Add track: ${playlist.tracks.first().info.title}")
+                    }
                     trackScheduler.queueList(playlist)
                     it.resume("Add ${playlist.tracks.size} tracks from ${playlist.name}")
                 }
