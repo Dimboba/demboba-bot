@@ -5,6 +5,8 @@ import dev.kord.core.event.message.MessageCreateEvent
 import dev.kord.core.on
 import dev.kord.gateway.Intent
 import dev.kord.gateway.PrivilegedIntent
+import laz.dimboba.dembobabot.controller.MusicMessageEventHandler
+import laz.dimboba.dembobabot.controller.SimpleMessageEventHandler
 import laz.dimboba.dembobabot.exceptions.NotACommandMessageException
 import laz.dimboba.dembobabot.exceptions.UnknownCommandException
 import laz.dimboba.dembobabot.voice.MusicPlayer
@@ -17,7 +19,8 @@ suspend fun main(args: Array<String>){
     val kord = Kord(token)
     val voiceConnectionsHandler = VoiceConnectionsHandler()
     val musicPlayer = MusicPlayer(voiceConnectionsHandler)
-    val messageEventHandler = MessageEventHandler(musicPlayer)
+    val messageEventHandler = SimpleMessageEventHandler()
+    val musicMessageEventHandler = MusicMessageEventHandler(musicPlayer)
     //получение каналов и групп каналов
 //    kord.guilds.first().channels.collect{
 //        channel -> println(channel.name + "  " + channel.type)

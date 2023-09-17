@@ -1,25 +1,20 @@
-package laz.dimboba.dembobabot
+package laz.dimboba.dembobabot.controller
 
 import dev.kord.core.behavior.reply
-import dev.kord.core.entity.Member
 import dev.kord.core.entity.Message
 import dev.kord.core.event.message.MessageCreateEvent
-import laz.dimboba.dembobabot.exceptions.CannotFindMemberException
 import laz.dimboba.dembobabot.exceptions.NotACommandMessageException
 import laz.dimboba.dembobabot.exceptions.NotEnoughArgumentsException
 import laz.dimboba.dembobabot.exceptions.UnknownCommandException
 import laz.dimboba.dembobabot.overwatch.OverbuffReader
 import laz.dimboba.dembobabot.overwatch.OverwatchPlayerStats
-import laz.dimboba.dembobabot.voice.MusicPlayer
 import java.text.SimpleDateFormat
 import java.util.*
 
 
 //TODO: ErrorHandler
 
-class MessageEventHandler(
-    private val musicPlayer: MusicPlayer
-) {
+class SimpleMessageEventHandler{
     private val commandChar: Char = '!'
     private var currMessage: Message? = null
 
@@ -48,8 +43,6 @@ class MessageEventHandler(
             "hello", "hi" -> reply("Hi, ${getName(message)} (^◡^)/")
             "fuckyou", "fuck", "fu", "fyou", "fucku" -> reply("Fuck off, ${getName(message)}")
             "overwatch" -> sendMessage(getAllStats(text))
-            "play" -> playMusic(text, messageCreateEvent.member, message)
-            "leave" -> leave(message)
 
             else -> throw UnknownCommandException("Unknown command: \"$command\"")
         }
@@ -70,25 +63,7 @@ class MessageEventHandler(
         val currDate = Calendar.getInstance().time
         return sdf.format(currDate)
     }
-
-    private suspend fun leave(message: Message) {
-        musicPlayer.leave(message)
-    }
-
     //parsed string below
-
-    private suspend fun playMusic(text: List<String>, member: Member?, message: Message) {
-
-        val channel = member?.getVoiceState()?.getChannelOrNull()
-            ?: throw CannotFindMemberException("There is no such member")
-
-
-        musicPlayer.playYTSong(
-            channel,
-            message,
-            message.content.removePrefix(commandChar + "play"))
-
-    }
 
     private fun getAllStats(text: List<String>): String {
         val stats: List<OverwatchPlayerStats>
