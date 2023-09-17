@@ -14,17 +14,15 @@ import java.util.*
 
 //TODO: ErrorHandler
 
-class SimpleMessageEventHandler{
+class SimpleMessageEventHandler: MessageEventHandler {
     private val commandChar: Char = '!'
     private var currMessage: Message? = null
 
-    suspend fun handleMessage(messageCreateEvent: MessageCreateEvent) {
+    override suspend fun handleMessage(messageEvent: MessageCreateEvent) {
 
-        currMessage = messageCreateEvent.message
-        val message = messageCreateEvent.message
-
+        currMessage = messageEvent.message
+        val message = messageEvent.message
         val text = message.content.split(" ")
-
         val keyword: String;
         try {
             keyword = text[0];

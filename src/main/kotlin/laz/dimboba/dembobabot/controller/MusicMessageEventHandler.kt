@@ -9,20 +9,20 @@ import laz.dimboba.dembobabot.exceptions.UnknownCommandException
 import laz.dimboba.dembobabot.voice.MusicPlayer
 import java.util.*
 
-class MusicMessageEventHandler(
+class MusicMessageEventHandler (
     private val musicPlayer: MusicPlayer
-) {
+): MessageEventHandler {
 
     private val commandChar: Char = '!'
     private var currMessage: Message? = null
 
 
-    suspend fun handleMessage(messageCreateEvent: MessageCreateEvent) {
+    override suspend fun handleMessage(messageEvent: MessageCreateEvent) {
 
-        currMessage = messageCreateEvent.message
-        val message = messageCreateEvent.message
 
-        val text = message.content.split(" ")
+        currMessage = messageEvent.message
+
+        val text = currMessage!!.content.split(" ")
 
         val keyword: String;
         try {
@@ -37,10 +37,10 @@ class MusicMessageEventHandler(
         //TODO: nicknames to battle tag from json through map for best pies on server
 
         when (val command = keyword.substring(1, keyword.length).lowercase(Locale.getDefault())) {
-            "play" -> playMusic(text, messageCreateEvent.member, message)
-            "leave" -> musicPlayer.leave(message)
-            "pause" -> musicPlayer.pause(message)
-            "next" -> musicPlayer.nextSong(message)
+            "play" -> playMusic(text, messageEvent.member, currMessage!!)
+            "leave" -> musicPlayer.leave(currMessage!!)
+            "pause" -> musicPlayer.pause(currMessage!!)
+            "next" -> musicPlayer.nextSong(currMessage!!)
 
             else -> throw UnknownCommandException("Unknown command: \"$command\"")
         }
