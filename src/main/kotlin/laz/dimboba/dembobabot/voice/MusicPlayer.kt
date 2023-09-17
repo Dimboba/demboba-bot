@@ -56,8 +56,8 @@ class MusicPlayer (
         trackScheduler.play(message, channel)
     }
 
-    suspend fun stop(message: Message) {
-
+    suspend fun pause(message: Message) {
+        trackScheduler.pause()
     }
 
     suspend fun leave(message: Message) {

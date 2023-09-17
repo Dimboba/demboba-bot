@@ -34,17 +34,26 @@ class TrackScheduler(
         audioTrackQueue.clear()
     }
 
+    fun pause() {
+        player.isPaused = true
+    }
+
     fun queueList(playlist: AudioPlaylist) {
         playlist.tracks.forEach { track -> audioTrackQueue.add(track) }
     }
 
     @OptIn(KordVoice::class)
     suspend fun play(message: Message, channel: BaseVoiceChannelBehavior){
-        if(voiceConnectionsHandler.isConnected(message.getGuild().id))
+        if(voiceConnectionsHandler.isConnected(message.getGuild().id)) {
+            if(player.isPaused)
+                player.isPaused = false
             return
+        }
+
         voiceGuild = message.getGuild()
         messageChannel = message.channel
         player.playTrack(audioTrackQueue.removeFirst())
+
         try{
             println("connecting")
             voiceConnectionsHandler.closeConnections(message.getGuild().id)
@@ -75,10 +84,18 @@ class TrackScheduler(
         }
     }
     private fun onPlayerPause(player: AudioPlayer){
-
+        runBlocking {
+            messageChannel?.createMessage(
+                "Player was stopped"
+            )
+        }
     }
     private fun onPlayerResume(player: AudioPlayer){
-
+        runBlocking {
+            messageChannel?.createMessage(
+                "Continue playing: ${player.playingTrack.info.title}"
+            )
+        }
     }
     private fun onTrackStart(player: AudioPlayer){
         runBlocking {
@@ -98,6 +115,7 @@ class TrackScheduler(
             return
         }
         player.playTrack(audioTrackQueue.removeFirst())
+
     }
     private fun onTrackException(player: AudioPlayer){
 
