@@ -11,11 +11,13 @@ import dev.kord.core.behavior.channel.BaseVoiceChannelBehavior
 import dev.kord.core.behavior.reply
 import dev.kord.core.entity.Message
 import dev.kord.voice.AudioFrame
+import kotlinx.coroutines.runBlocking
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 //TODO: leave if there is no songs (occurs bugs)
 //TODO: create query for songs (like !next)
+//TODO: trackScheduler + MusicPlayer to one class
 
 class MusicPlayer (
     private val voiceConnectionsHandler: VoiceConnectionsHandler
@@ -56,8 +58,12 @@ class MusicPlayer (
         trackScheduler.play(message, channel)
     }
 
-    suspend fun pause(message: Message) {
+    fun pause(message: Message) {
         trackScheduler.pause()
+    }
+
+    fun nextSong(message: Message) {
+        trackScheduler.nextSong(message)
     }
 
     suspend fun leave(message: Message) {

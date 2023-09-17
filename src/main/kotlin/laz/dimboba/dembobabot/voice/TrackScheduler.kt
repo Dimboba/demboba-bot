@@ -30,6 +30,17 @@ class TrackScheduler(
 
     }
 
+    fun nextSong(message: Message) {
+        runBlocking {
+            message.reply {
+                "Track ${player.playingTrack.info.title} was skipped"
+            }
+
+
+            player.playTrack(audioTrackQueue.removeFirst())
+        }
+    }
+
     fun emptyQueue() {
         audioTrackQueue.clear()
     }
