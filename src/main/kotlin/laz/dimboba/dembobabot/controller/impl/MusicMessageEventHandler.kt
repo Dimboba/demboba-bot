@@ -38,17 +38,18 @@ class MusicMessageEventHandler (
         //TODO: nicknames to battle tag from json through map for best pies on server
 
         when (val command = keyword.substring(1, keyword.length).lowercase(Locale.getDefault())) {
-            "play" -> playMusic(text, messageEvent.member, currMessage!!)
+            "play" -> playMusic(messageEvent.member, currMessage!!)
             "leave" -> trackScheduler.leave(currMessage!!)
             "pause" -> trackScheduler.pause(currMessage!!)
             "next" -> trackScheduler.nextSong(currMessage!!)
             "queue" -> trackScheduler.showQueue(currMessage!!)
+            "clear" -> trackScheduler.emptyQueue(currMessage!!)
 
             else -> throw UnknownCommandException("Unknown command: \"$command\"")
         }
     }
 
-    private suspend fun playMusic(text: List<String>, member: Member?, message: Message) {
+    private suspend fun playMusic(member: Member?, message: Message) {
 
         val channel = member?.getVoiceState()?.getChannelOrNull()
             ?: throw CannotFindMemberException("There is no such member")
