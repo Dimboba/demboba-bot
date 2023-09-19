@@ -1,6 +1,7 @@
 package laz.dimboba.dembobabot.voice
 
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler
+import com.sedmelluq.discord.lavaplayer.player.AudioPlayer
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException
@@ -28,11 +29,8 @@ class MusicPlayer (
         AudioSourceManagers.registerRemoteSources(lavaplayerManager)
     }
 
-    private val player = lavaplayerManager.createPlayer()
-    private val trackScheduler = TrackScheduler(player, voiceConnectionsHandler)
-    init {
-        player.addListener(trackScheduler)
-    }
+    private var player: AudioPlayer? = null
+    private var trackScheduler: TrackScheduler? = null
 
     suspend fun playYTSong(
         channel: BaseVoiceChannelBehavior,
@@ -53,22 +51,27 @@ class MusicPlayer (
             isSearch = true
             "ytsearch: $search"
         }
-        println(query)
+        if(player == null) {
+            player = lavaplayerManager.createPlayer()
+            trackScheduler = TrackScheduler(player!!, voiceConnectionsHandler)
+            player?.addListener(trackScheduler)
+        }
         lavaplayerManager.loadTrack(query, message, isSearch)
-        trackScheduler.play(message, channel)
+        trackScheduler?.play(message, channel)
     }
 
     fun pause(message: Message) {
-        trackScheduler.pause()
+        trackScheduler?.pause()
     }
 
     fun nextSong(message: Message) {
-        trackScheduler.nextSong(message)
+        trackScheduler?.nextSong(message)
     }
 
     suspend fun leave(message: Message) {
         voiceConnectionsHandler.closeConnections(message.getGuild().id)
-        trackScheduler.emptyQueue()
+        trackScheduler?.emptyQueue()
+        player?.destroy()
         message.reply {
             content = "Music player is shutdown"
         }
@@ -82,16 +85,17 @@ class MusicPlayer (
         val messageContent = suspendCoroutine<String> {
             this.loadItem(query, object : AudioLoadResultHandler {
                 override fun trackLoaded(track: AudioTrack) {
-                    trackScheduler.queue(track)
+                    trackScheduler?.queue(track)
                     it.resume("Add track: ${track.info.title}")
                 }
 
                 override fun playlistLoaded(playlist: AudioPlaylist) {
                     if(isSearch){
-                        trackScheduler.queue(playlist.tracks.first())
+                        trackScheduler?.queue(playlist.tracks.first())
                         it.resume("Add track: ${playlist.tracks.first().info.title}")
+                        return
                     }
-                    trackScheduler.queueList(playlist)
+                    trackScheduler?.queueList(playlist)
                     it.resume("Add ${playlist.tracks.size} tracks from ${playlist.name}")
                 }
 
