@@ -7,8 +7,8 @@ import dev.kord.gateway.Intent
 import dev.kord.gateway.PrivilegedIntent
 import laz.dimboba.dembobabot.controller.MessageEventHandler
 import laz.dimboba.dembobabot.controller.MessageHandler
-import laz.dimboba.dembobabot.controller.MusicMessageEventHandler
-import laz.dimboba.dembobabot.controller.SimpleMessageEventHandler
+import laz.dimboba.dembobabot.controller.impl.MusicMessageEventHandler
+import laz.dimboba.dembobabot.controller.impl.SimpleMessageEventHandler
 import laz.dimboba.dembobabot.exceptions.NotACommandMessageException
 import laz.dimboba.dembobabot.exceptions.UnknownCommandException
 import laz.dimboba.dembobabot.voice.TrackScheduler

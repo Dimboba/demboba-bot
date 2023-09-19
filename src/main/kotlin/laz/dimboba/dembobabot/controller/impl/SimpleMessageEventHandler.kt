@@ -1,8 +1,9 @@
-package laz.dimboba.dembobabot.controller
+package laz.dimboba.dembobabot.controller.impl
 
 import dev.kord.core.behavior.reply
 import dev.kord.core.entity.Message
 import dev.kord.core.event.message.MessageCreateEvent
+import laz.dimboba.dembobabot.controller.MessageEventHandler
 import laz.dimboba.dembobabot.exceptions.NotACommandMessageException
 import laz.dimboba.dembobabot.exceptions.NotEnoughArgumentsException
 import laz.dimboba.dembobabot.exceptions.UnknownCommandException
