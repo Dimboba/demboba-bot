@@ -57,13 +57,7 @@ class TrackScheduler(
     }
 
     fun nextSong(message: Message) {
-        println("skipping song")
-
-        if(audioTrackQueue.isNotEmpty()) {
-            player.stopTrack()
-        } else {
-            player.stopTrack()
-        }
+        player.stopTrack()
 
         runBlocking {
             message.reply {
