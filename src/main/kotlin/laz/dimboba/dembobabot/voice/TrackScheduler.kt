@@ -18,6 +18,7 @@ import dev.kord.core.entity.Message
 import dev.kord.core.entity.channel.MessageChannel
 import dev.kord.voice.AudioFrame
 import kotlinx.coroutines.runBlocking
+import java.lang.Integer.min
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -45,8 +46,19 @@ class TrackScheduler(
     //TODO: fix
 
     fun showQueue(message: Message) {
-        var answer: String = "";
-        audioTrackQueue.forEach { track -> answer += (track.info.title + '\n') }
+        if(audioTrackQueue.isEmpty()) {
+            runBlocking {
+                message.reply {
+                    content = "Queue is empty"
+                }
+            }
+        }
+
+        var answer: String = "There is ${audioTrackQueue.size} tracks in queue \n" +
+                "First ${min(audioTrackQueue.size, 10)} tracks are: \n";
+        for(i in 0..< min(audioTrackQueue.size, 10)){
+            answer += ("-) ${audioTrackQueue[i].info.title} \n")
+        }
 
 
         runBlocking {
@@ -57,18 +69,26 @@ class TrackScheduler(
     }
 
     fun nextSong(message: Message) {
-        player.stopTrack()
 
         runBlocking {
             message.reply {
                 content = "Track ${player.playingTrack.info.title} was skipped"
             }
-
         }
+
+        player.stopTrack()
+
     }
 
     fun emptyQueue(message: Message) {
+        val size = audioTrackQueue.size
         audioTrackQueue.clear()
+
+        runBlocking {
+            message.reply {
+                content = "$size tracks was removed from queue"
+            }
+        }
     }
 
     fun pause(message: Message) {
