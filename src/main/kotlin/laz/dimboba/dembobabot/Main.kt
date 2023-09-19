@@ -11,7 +11,7 @@ import laz.dimboba.dembobabot.controller.MusicMessageEventHandler
 import laz.dimboba.dembobabot.controller.SimpleMessageEventHandler
 import laz.dimboba.dembobabot.exceptions.NotACommandMessageException
 import laz.dimboba.dembobabot.exceptions.UnknownCommandException
-import laz.dimboba.dembobabot.voice.MusicPlayer
+import laz.dimboba.dembobabot.voice.TrackScheduler
 import laz.dimboba.dembobabot.voice.VoiceConnectionsHandler
 
 suspend fun main(args: Array<String>){
@@ -20,10 +20,10 @@ suspend fun main(args: Array<String>){
 
     val kord = Kord(token)
     val voiceConnectionsHandler = VoiceConnectionsHandler()
-    val musicPlayer = MusicPlayer(voiceConnectionsHandler)
+    val trackScheduler = TrackScheduler(voiceConnectionsHandler)
 
     val simpleMessageEventHandler: MessageEventHandler = SimpleMessageEventHandler()
-    val musicMessageEventHandler: MessageEventHandler = MusicMessageEventHandler(musicPlayer)
+    val musicMessageEventHandler: MessageEventHandler = MusicMessageEventHandler(trackScheduler)
 
     val messageHandler = MessageHandler(listOf(simpleMessageEventHandler, musicMessageEventHandler))
     //получение каналов и групп каналов

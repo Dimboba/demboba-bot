@@ -6,11 +6,11 @@ import dev.kord.core.event.message.MessageCreateEvent
 import laz.dimboba.dembobabot.exceptions.CannotFindMemberException
 import laz.dimboba.dembobabot.exceptions.NotACommandMessageException
 import laz.dimboba.dembobabot.exceptions.UnknownCommandException
-import laz.dimboba.dembobabot.voice.MusicPlayer
+import laz.dimboba.dembobabot.voice.TrackScheduler
 import java.util.*
 
 class MusicMessageEventHandler (
-    private val musicPlayer: MusicPlayer
+    private val trackScheduler: TrackScheduler
 ): MessageEventHandler {
 
     private val commandChar: Char = '!'
@@ -38,9 +38,9 @@ class MusicMessageEventHandler (
 
         when (val command = keyword.substring(1, keyword.length).lowercase(Locale.getDefault())) {
             "play" -> playMusic(text, messageEvent.member, currMessage!!)
-            "leave" -> musicPlayer.leave(currMessage!!)
-            "pause" -> musicPlayer.pause(currMessage!!)
-            "next" -> musicPlayer.nextSong(currMessage!!)
+            "leave" -> trackScheduler.leave(currMessage!!)
+            "pause" -> trackScheduler.pause(currMessage!!)
+            "next" -> trackScheduler.nextSong(currMessage!!)
 
             else -> throw UnknownCommandException("Unknown command: \"$command\"")
         }
@@ -54,9 +54,9 @@ class MusicMessageEventHandler (
             ?: throw CannotFindMemberException("There is no such member")
 
 
-        musicPlayer.playYTSong(
-            channel,
+        trackScheduler.play(
             message,
+            channel,
             message.content.removePrefix(commandChar + "play"))
 
     }
