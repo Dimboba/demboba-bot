@@ -42,11 +42,10 @@ class MusicMessageEventHandler (
             "leave" -> trackScheduler.leave(currMessage!!)
             "pause" -> trackScheduler.pause(currMessage!!)
             "next" -> trackScheduler.nextSong(currMessage!!)
+            "queue" -> trackScheduler.showQueue(currMessage!!)
 
             else -> throw UnknownCommandException("Unknown command: \"$command\"")
         }
-
-
     }
 
     private suspend fun playMusic(text: List<String>, member: Member?, message: Message) {

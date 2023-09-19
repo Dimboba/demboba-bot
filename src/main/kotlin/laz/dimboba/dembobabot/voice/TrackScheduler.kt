@@ -43,23 +43,34 @@ class TrackScheduler(
     // interactions
 
     //TODO: fix
+
+    fun showQueue(message: Message) {
+        var answer: String = "";
+        audioTrackQueue.forEach { track -> answer += (track.info.title + '\n') }
+
+
+        runBlocking {
+            message.reply {
+                content = answer
+            }
+        }
+    }
+
     fun nextSong(message: Message) {
         println("skipping song")
-/*
+
         if(audioTrackQueue.isNotEmpty()) {
-            player.playTrack(audioTrackQueue.removeFirst())
+            player.stopTrack()
         } else {
             player.stopTrack()
         }
 
         runBlocking {
             message.reply {
-                "Track ${player.playingTrack.info.title} was skipped"
+                content = "Track ${player.playingTrack.info.title} was skipped"
             }
 
         }
-
- */
     }
 
     fun emptyQueue(message: Message) {
