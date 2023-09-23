@@ -5,6 +5,7 @@ import dev.kord.core.event.message.MessageCreateEvent
 import dev.kord.core.on
 import dev.kord.gateway.Intent
 import dev.kord.gateway.PrivilegedIntent
+import kotlinx.coroutines.flow.first
 import laz.dimboba.dembobabot.controller.MessageEventHandler
 import laz.dimboba.dembobabot.controller.MessageHandler
 import laz.dimboba.dembobabot.controller.impl.MusicMessageEventHandler
@@ -30,12 +31,16 @@ suspend fun main(args: Array<String>){
 //    kord.guilds.first().channels.collect{
 //        channel -> println(channel.name + "  " + channel.type)
 //    }
-
+//
 //    val generalChannel = kord.guilds
 //        .first()
 //        .channels
 //        .first { channel -> channel.name == "основной" || channel.name == "general" }
     //kord.createGuildChatInputCommand()
+
+//    kord.guilds.collect {
+//        guild -> println(guild.name + " " + guild.applicationId)
+//    }
 
     kord.on<MessageCreateEvent> {
 

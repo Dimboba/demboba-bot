@@ -21,6 +21,7 @@ class MusicMessageEventHandler (
     override suspend fun handleMessage(messageEvent: MessageCreateEvent) {
 
 
+
         currMessage = messageEvent.message
 
         val text = currMessage!!.content.split(" ")
