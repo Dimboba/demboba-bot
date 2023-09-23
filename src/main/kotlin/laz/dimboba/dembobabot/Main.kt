@@ -6,10 +6,14 @@ import dev.kord.core.on
 import dev.kord.gateway.Intent
 import dev.kord.gateway.PrivilegedIntent
 import kotlinx.coroutines.flow.first
+import laz.dimboba.dembobabot.channel.ChannelHandler
+import laz.dimboba.dembobabot.channel.ChannelType
 import laz.dimboba.dembobabot.controller.MessageEventHandler
 import laz.dimboba.dembobabot.controller.MessageHandler
+import laz.dimboba.dembobabot.controller.impl.ChannelMessageEventHandler
 import laz.dimboba.dembobabot.controller.impl.MusicMessageEventHandler
 import laz.dimboba.dembobabot.controller.impl.SimpleMessageEventHandler
+import laz.dimboba.dembobabot.exceptions.GuildAlreadyExists
 import laz.dimboba.dembobabot.exceptions.NotACommandMessageException
 import laz.dimboba.dembobabot.exceptions.UnknownCommandException
 import laz.dimboba.dembobabot.voice.TrackScheduler
@@ -22,11 +26,19 @@ suspend fun main(args: Array<String>){
     val kord = Kord(token)
     val voiceConnectionsHandler = VoiceConnectionsHandler()
     val trackScheduler = TrackScheduler(voiceConnectionsHandler)
+    val channelHandler = ChannelHandler(kord.guilds.first())
 
-    val simpleMessageEventHandler: MessageEventHandler = SimpleMessageEventHandler()
-    val musicMessageEventHandler: MessageEventHandler = MusicMessageEventHandler(trackScheduler)
+    val simpleMessageEventHandler = SimpleMessageEventHandler()
+    val musicMessageEventHandler = MusicMessageEventHandler(trackScheduler)
+    val channelMessageEventHandler = ChannelMessageEventHandler(channelHandler)
+    val messageHandler = MessageHandler(
+        listOf(
+            simpleMessageEventHandler,
+            musicMessageEventHandler,
+            channelMessageEventHandler
+        )
+    )
 
-    val messageHandler = MessageHandler(listOf(simpleMessageEventHandler, musicMessageEventHandler))
     //получение каналов и групп каналов
 //    kord.guilds.first().channels.collect{
 //        channel -> println(channel.name + "  " + channel.type)
@@ -42,12 +54,21 @@ suspend fun main(args: Array<String>){
 //        guild -> println(guild.name + " " + guild.applicationId)
 //    }
 
+
     kord.on<MessageCreateEvent> {
 
         // ignore other bots, even ourselves. We only serve humans here!
         if (message.author?.isBot != false) return@on
 
         println(message.content)
+
+//        try {
+//            if (message.content == "!create") {
+//                channelHandler.createChannelIfNotExist("music", ChannelType.VOICE)
+//            }
+//        } catch (ex: GuildAlreadyExists) {
+//            ex.message?.let { message.channel.createMessage(it) }
+//        }
 
         try {
             messageHandler.handleMessage(this)

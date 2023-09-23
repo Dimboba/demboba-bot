@@ -1,6 +1,6 @@
 package laz.dimboba.dembobabot.channel
 
-enum class ChannelType {
+enum class ChannelType() {
     TEXT,
     VOICE,
     NEWS
