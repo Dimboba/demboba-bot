@@ -15,8 +15,9 @@ import java.util.*
 
 //TODO: ErrorHandler
 
-class SimpleMessageEventHandler: MessageEventHandler {
+class SimpleMessageEventHandler(
     private val commandChar: Char = '!'
+) : MessageEventHandler {
     private var currMessage: Message? = null
 
     override suspend fun handleMessage(messageEvent: MessageCreateEvent) {

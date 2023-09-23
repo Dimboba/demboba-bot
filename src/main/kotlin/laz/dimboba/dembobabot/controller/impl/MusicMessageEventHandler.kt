@@ -11,10 +11,10 @@ import laz.dimboba.dembobabot.voice.TrackScheduler
 import java.util.*
 
 class MusicMessageEventHandler (
-    private val trackScheduler: TrackScheduler
+    private val trackScheduler: TrackScheduler,
+    private val commandChar: Char = '!'
 ): MessageEventHandler {
 
-    private val commandChar: Char = '!'
     private var currMessage: Message? = null
 
 
