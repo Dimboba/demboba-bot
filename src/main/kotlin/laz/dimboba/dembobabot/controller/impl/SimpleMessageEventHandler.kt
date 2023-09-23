@@ -22,8 +22,7 @@ class SimpleMessageEventHandler: MessageEventHandler {
     override suspend fun handleMessage(messageEvent: MessageCreateEvent) {
 
         currMessage = messageEvent.message
-        val message = messageEvent.message
-        val text = message.content.split(" ")
+        val text = currMessage!!.content.split(" ")
         val keyword: String;
         try {
             keyword = text[0];
@@ -39,8 +38,8 @@ class SimpleMessageEventHandler: MessageEventHandler {
         when (val command = keyword.substring(1, keyword.length).lowercase(Locale.getDefault())) {
             "ping" -> sendMessage("pong!")
             "time" -> reply(getTime())
-            "hello", "hi" -> reply("Hi, ${getName(message)} (^◡^)/")
-            "fuckyou", "fuck", "fu", "fyou", "fucku" -> reply("Fuck off, ${getName(message)}")
+            "hello", "hi" -> reply("Hi, ${getName(currMessage!!)} (^◡^)/")
+            "fuckyou", "fuck", "fu", "fyou", "fucku" -> reply("Fuck off, ${getName(currMessage!!)}")
             "overwatch" -> sendMessage(getAllStats(text))
 
             else -> throw UnknownCommandException("Unknown command: \"$command\"")
