@@ -52,6 +52,7 @@ class TrackScheduler(
                     content = "Queue is empty"
                 }
             }
+            return
         }
 
         var answer: String = "There is ${audioTrackQueue.size} tracks in queue \n" +
