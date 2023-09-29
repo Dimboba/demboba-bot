@@ -3,7 +3,7 @@ package laz.dimboba.dembobabot.controller.impl
 import dev.kord.core.entity.Message
 import dev.kord.core.event.message.MessageCreateEvent
 import laz.dimboba.dembobabot.channel.ChannelHandler
-import laz.dimboba.dembobabot.channel.ChannelType
+import laz.dimboba.dembobabot.channel.MessageChannelType
 import laz.dimboba.dembobabot.controller.MessageEventHandler
 import laz.dimboba.dembobabot.exceptions.NotACommandMessageException
 import laz.dimboba.dembobabot.exceptions.UnknownCommandException
@@ -37,7 +37,7 @@ class ChannelMessageEventHandler(
         when (val command = keyword.substring(1, keyword.length).lowercase(Locale.getDefault())) {
             "create-channel" -> createChannel(text)
             "delete-channel" -> TODO()
-            "create-category" -> TODO()
+            "create-category" -> createCategory(text)
             "delete-category" -> TODO()
             else -> throw UnknownCommandException("Unknown command: \"$command\"")
         }
@@ -46,8 +46,18 @@ class ChannelMessageEventHandler(
     private suspend fun createChannel(text: List<String>) {
         channelHandler.createChannelIfNotExist(
             name = text[2],
-            type = ChannelType.valueOf(text[1].uppercase(Locale.getDefault())),
-            //category = if(text.size > 3) text[4] else null
+            type = MessageChannelType.valueOf(text[1].uppercase(Locale.getDefault())),
+            categoryName = if(text.size > 3) text[3] else null
+        )
+    }
+
+    private suspend fun createCategory(text: List<String>) {
+        channelHandler.createCategoryIfNotExist(text[1])
+    }
+
+    private suspend fun deleteChannel(text: List<String>) {
+        channelHandler.deleteChannelIfExist(
+            name = text[1]
         )
     }
 }

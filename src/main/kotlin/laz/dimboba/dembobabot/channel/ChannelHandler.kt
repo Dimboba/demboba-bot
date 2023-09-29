@@ -1,35 +1,73 @@
 package laz.dimboba.dembobabot.channel
 
-import dev.kord.core.behavior.GuildBehavior
-import dev.kord.core.behavior.channel.createNewsChannel
-import dev.kord.core.behavior.channel.createTextChannel
-import dev.kord.core.behavior.channel.createVoiceChannel
-import dev.kord.core.behavior.createNewsChannel
-import dev.kord.core.behavior.createTextChannel
-import dev.kord.core.behavior.createVoiceChannel
-import dev.kord.core.entity.Guild
+import dev.kord.common.entity.ChannelType
+import dev.kord.core.behavior.*
 import dev.kord.core.entity.channel.Category
+import dev.kord.core.entity.channel.TopGuildChannel
 import kotlinx.coroutines.flow.firstOrNull
 import laz.dimboba.dembobabot.exceptions.GuildAlreadyExists
 
 class ChannelHandler (
-    val serverGuild: Guild
+    private val serverGuild: GuildBehavior
 ) {
 
-    suspend fun createChannelIfNotExist (name: String, type: ChannelType, category: Category? = null) {
-        val parentGuild = category?.guild ?: serverGuild
+    //TODO: fix creating channel in category
+    suspend fun createChannelIfNotExist (name: String, type: MessageChannelType, categoryName: String? = null) {
+        val parentGuild = findCategoryByName(categoryName)
+
+        println(serverGuild.id)
 
 
         val channelName = name.trim()
-        if (parentGuild.channels.firstOrNull { channel -> channel.name == channelName } != null) {
+        if (serverGuild.channels.firstOrNull {
+            channel -> channel.name == channelName
+                    && channel.type == type.kordType
+                    && channel.data.parentId?.value == parentGuild?.id
+        } != null) {
             throw GuildAlreadyExists("There is channel with name: $channelName")
         }
-
         when (type) {
-            ChannelType.TEXT -> parentGuild.createTextChannel(channelName)
-            ChannelType.VOICE -> parentGuild.createVoiceChannel(channelName)
-            ChannelType.NEWS -> parentGuild.createNewsChannel(channelName)
+            MessageChannelType.TEXT -> serverGuild.createTextChannel(
+                channelName
+            ) {
+                parentId = parentGuild?.id
+            }
+
+            MessageChannelType.VOICE -> serverGuild.createVoiceChannel(
+                channelName
+            ) {
+                parentId = parentGuild?.id
+            }
+
+            MessageChannelType.NEWS -> serverGuild.createNewsChannel(
+                channelName
+            ) {
+                parentId = parentGuild?.id
+            }
         }
     }
 
+    suspend fun createCategoryIfNotExist (name: String) {
+        val channelName = name.trim()
+        if(serverGuild.channels.firstOrNull {
+            channel -> channel.name == channelName && channel.type == ChannelType.GuildCategory
+        } != null) {
+            throw GuildAlreadyExists("There is category with name: $channelName")
+        }
+        serverGuild.createCategory(channelName)
+    }
+
+    suspend fun deleteChannelIfExist (name: String, category: Category? = null) {
+        val parentGuild = category?.guild ?: serverGuild
+    }
+
+    private suspend fun findCategoryByName(name: String?): TopGuildChannel? {
+        println(name)
+        if(name == null) return null
+        return serverGuild.channels.firstOrNull { channel ->
+            channel.name.equals(name.trim(), ignoreCase = true)
+                    && channel.type == ChannelType.GuildCategory
+        }
+    }
 }
+
