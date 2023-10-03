@@ -10,6 +10,8 @@ import laz.dimboba.dembobabot.exceptions.UnknownCommandException
 import laz.dimboba.dembobabot.voice.TrackScheduler
 import java.util.*
 
+//TODO: enum with valueOf for commands
+
 class MusicMessageEventHandler (
     private val trackScheduler: TrackScheduler,
     private val commandChar: Char = '!'
@@ -45,6 +47,7 @@ class MusicMessageEventHandler (
             "next" -> trackScheduler.nextSong(currMessage!!)
             "queue" -> trackScheduler.showQueue(currMessage!!)
             "clear" -> trackScheduler.emptyQueue(currMessage!!)
+//            "repeat" -> trackScheduler.repeat(currMessage!!)
 
             else -> throw UnknownCommandException("Unknown command: \"$command\"")
         }

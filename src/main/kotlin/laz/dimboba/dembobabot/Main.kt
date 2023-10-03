@@ -7,13 +7,10 @@ import dev.kord.gateway.Intent
 import dev.kord.gateway.PrivilegedIntent
 import kotlinx.coroutines.flow.first
 import laz.dimboba.dembobabot.channel.ChannelHandler
-import laz.dimboba.dembobabot.channel.ChannelType
-import laz.dimboba.dembobabot.controller.MessageEventHandler
 import laz.dimboba.dembobabot.controller.MessageHandler
 import laz.dimboba.dembobabot.controller.impl.ChannelMessageEventHandler
 import laz.dimboba.dembobabot.controller.impl.MusicMessageEventHandler
 import laz.dimboba.dembobabot.controller.impl.SimpleMessageEventHandler
-import laz.dimboba.dembobabot.exceptions.GuildAlreadyExists
 import laz.dimboba.dembobabot.exceptions.NotACommandMessageException
 import laz.dimboba.dembobabot.exceptions.UnknownCommandException
 import laz.dimboba.dembobabot.voice.TrackScheduler
@@ -41,7 +38,7 @@ suspend fun main(args: Array<String>){
 
     //получение каналов и групп каналов
 //    kord.guilds.first().channels.collect{
-//        channel -> println(channel.name + "  " + channel.type)
+   //     channel -> println(channel.name + "  " + channel.type)
 //    }
 //
 //    val generalChannel = kord.guilds
@@ -77,7 +74,8 @@ suspend fun main(args: Array<String>){
                 "В Политехе такому не учили :<"
             )
             return@on
-        } catch (_: NotACommandMessageException) {
+        } catch (ex: Exception) {
+            error(ex.localizedMessage)
             return@on
         }
 

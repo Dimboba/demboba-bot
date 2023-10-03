@@ -14,6 +14,7 @@ import java.util.*
 
 
 //TODO: ErrorHandler
+//TODO: enum with valueOf for commands
 
 class SimpleMessageEventHandler(
     private val commandChar: Char = '!'

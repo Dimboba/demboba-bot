@@ -17,6 +17,7 @@ import dev.kord.core.entity.Guild
 import dev.kord.core.entity.Message
 import dev.kord.core.entity.channel.MessageChannel
 import dev.kord.voice.AudioFrame
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import java.lang.Integer.min
 import kotlin.coroutines.resume
@@ -31,6 +32,7 @@ class TrackScheduler(
     private val lavaplayerManager = DefaultAudioPlayerManager()
     private val audioTrackQueue = ArrayList<AudioTrack>()
     private val player = lavaplayerManager.createPlayer()
+    private var repeat: AudioTrack? = null
 
     private var messageChannel: MessageChannelBehavior? = null
     private var voiceGuild: Guild? = null
@@ -42,8 +44,6 @@ class TrackScheduler(
     }
 
     // interactions
-
-    //TODO: fix
 
     fun showQueue(message: Message) {
         if(audioTrackQueue.isEmpty()) {
@@ -66,6 +66,28 @@ class TrackScheduler(
             message.reply {
                 content = answer
             }
+        }
+    }
+
+    //TODO: fix because track's state = FINISHED
+    fun repeat(message: Message) {
+        val answer: String
+        if(repeat != null) {
+            answer = "Stop repeating"
+            repeat = null
+        } else {
+            if(player.playingTrack == null) {
+                answer = "Nothing to repeat"
+            } else {
+                repeat = player.playingTrack
+                answer = "Repeating track: ${player.playingTrack.info.title}"
+            }
+        }
+
+        runBlocking {
+            messageChannel?.createMessage(
+                content = answer
+            )
         }
     }
 
@@ -176,6 +198,14 @@ class TrackScheduler(
         }
     }
     private fun onTrackEnd(player: AudioPlayer){
+
+        //TODO: fix (not working because track's state = FINISHED
+//        if(repeat != null) {
+//            repeat?.position = 0
+//            player.playTrack(repeat)
+//            return
+//        }
+
         if(audioTrackQueue.isEmpty()){
             runBlocking {
                 voiceGuild?.id?.let { voiceConnectionsHandler.closeConnections(it) }
