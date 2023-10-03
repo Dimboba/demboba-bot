@@ -17,6 +17,7 @@ import dev.kord.core.entity.Guild
 import dev.kord.core.entity.Message
 import dev.kord.core.entity.channel.MessageChannel
 import dev.kord.voice.AudioFrame
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import java.lang.Integer.min
@@ -24,6 +25,8 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 //TODO: false message about empty queue after leave
+
+private val logger = KotlinLogging.logger {  }
 
 class TrackScheduler(
     private val voiceConnectionsHandler: VoiceConnectionsHandler
@@ -41,6 +44,10 @@ class TrackScheduler(
         //lavaplayerManager.registerSourceManager(YoutubeAudioSourceManager())
         AudioSourceManagers.registerRemoteSources(lavaplayerManager)
         player.addListener(this)
+
+        logger.info {
+            "TrackScheduler is started"
+        }
     }
 
     // interactions
@@ -158,6 +165,7 @@ class TrackScheduler(
                 }
             }
         } catch (ex: Exception) {
+            logger.error(ex) { "Failed to connect to VoiceChannel"}
             //TODO: refactor, just for test
             println("error while voice connecting")
             throw Exception(ex.localizedMessage)
@@ -287,6 +295,7 @@ class TrackScheduler(
                 }
 
                 override fun loadFailed(exception: FriendlyException?) {
+                    logger.error(exception) { "Failed to load, query: $query" }
                     it.resume("An error occurred")
                 }
             })

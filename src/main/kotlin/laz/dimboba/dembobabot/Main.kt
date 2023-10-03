@@ -2,9 +2,11 @@ package laz.dimboba.dembobabot
 
 import dev.kord.core.Kord
 import dev.kord.core.event.message.MessageCreateEvent
+import dev.kord.core.kordLogger
 import dev.kord.core.on
 import dev.kord.gateway.Intent
 import dev.kord.gateway.PrivilegedIntent
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.flow.first
 import laz.dimboba.dembobabot.channel.ChannelHandler
 import laz.dimboba.dembobabot.controller.MessageHandler
@@ -23,6 +25,7 @@ suspend fun main(args: Array<String>){
     val kord = Kord(token)
     val voiceConnectionsHandler = VoiceConnectionsHandler()
     val trackScheduler = TrackScheduler(voiceConnectionsHandler)
+    //TODO: better search for serverGuild
     val channelHandler = ChannelHandler(kord.guilds.first())
 
     val simpleMessageEventHandler = SimpleMessageEventHandler()
@@ -75,7 +78,7 @@ suspend fun main(args: Array<String>){
             )
             return@on
         } catch (ex: Exception) {
-            error(ex.localizedMessage)
+            //error(ex.localizedMessage)
             return@on
         }
 

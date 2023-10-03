@@ -1,12 +1,19 @@
 package laz.dimboba.dembobabot.overwatch
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import laz.dimboba.dembobabot.exceptions.NotABattleTagException
 import laz.dimboba.dembobabot.exceptions.ParsingHTMLException
 import org.jsoup.Jsoup
 import java.util.*
 
+private val logger = KotlinLogging.logger {  }
+
 class OverbuffReader {
     private val address = "https://www.overbuff.com/players/"
+
+    init {
+        logger.info { "OverbuffReader is started" }
+    }
 
     fun getPlayerStats(battleTag: String, gameMode: String = "All"): OverwatchPlayerStats {
 

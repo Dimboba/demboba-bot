@@ -25,6 +25,9 @@ dependencies {
     implementation("dev.kord:kord-core-voice:0.10.0")
     // Lavaplayer
     implementation("com.sedmelluq:lavaplayer:1.3.77")
+    // Logging
+    implementation("io.github.oshai:kotlin-logging-jvm:5.1.0")
+    implementation("org.slf4j:slf4j-simple:2.0.3")
 }
 
 application {
