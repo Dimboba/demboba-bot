@@ -1,4 +1,3 @@
 package laz.dimboba.dembobabot.exceptions
 
-class GuildAlreadyExists(message: String): Exception(message){
-}
+class GuildAlreadyExists(message: String) : Exception(message)

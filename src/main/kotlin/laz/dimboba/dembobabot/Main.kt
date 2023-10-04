@@ -2,23 +2,20 @@ package laz.dimboba.dembobabot
 
 import dev.kord.core.Kord
 import dev.kord.core.event.message.MessageCreateEvent
-import dev.kord.core.kordLogger
 import dev.kord.core.on
 import dev.kord.gateway.Intent
 import dev.kord.gateway.PrivilegedIntent
-import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.flow.first
 import laz.dimboba.dembobabot.channel.ChannelHandler
 import laz.dimboba.dembobabot.controller.MessageHandler
 import laz.dimboba.dembobabot.controller.impl.ChannelMessageEventHandler
 import laz.dimboba.dembobabot.controller.impl.MusicMessageEventHandler
 import laz.dimboba.dembobabot.controller.impl.SimpleMessageEventHandler
-import laz.dimboba.dembobabot.exceptions.NotACommandMessageException
 import laz.dimboba.dembobabot.exceptions.UnknownCommandException
 import laz.dimboba.dembobabot.voice.TrackScheduler
 import laz.dimboba.dembobabot.voice.VoiceConnectionsHandler
 
-suspend fun main(args: Array<String>){
+suspend fun main(args: Array<String>) {
 
     val token: String = System.getenv("discord_token") ?: "null-token"
 
@@ -41,7 +38,7 @@ suspend fun main(args: Array<String>){
 
     //получение каналов и групп каналов
 //    kord.guilds.first().channels.collect{
-   //     channel -> println(channel.name + "  " + channel.type)
+    //     channel -> println(channel.name + "  " + channel.type)
 //    }
 //
 //    val generalChannel = kord.guilds

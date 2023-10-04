@@ -1,4 +1,3 @@
 package laz.dimboba.dembobabot.exceptions
 
-class UnknownCommandException(message: String): Exception(message) {
-}
+class UnknownCommandException(message: String) : Exception(message)

@@ -1,4 +1,3 @@
 package laz.dimboba.dembobabot.exceptions
 
-class NotACommandMessageException(message:String): Exception(message) {
-}
+class NotACommandMessageException(message: String) : Exception(message)

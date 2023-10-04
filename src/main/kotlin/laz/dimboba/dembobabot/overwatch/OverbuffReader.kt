@@ -6,7 +6,7 @@ import laz.dimboba.dembobabot.exceptions.ParsingHTMLException
 import org.jsoup.Jsoup
 import java.util.*
 
-private val logger = KotlinLogging.logger {  }
+private val logger = KotlinLogging.logger { }
 
 class OverbuffReader {
     private val address = "https://www.overbuff.com/players/"
@@ -23,7 +23,7 @@ class OverbuffReader {
 
         var postfixUrl: String = ""
 
-        if(gameMode != "All")
+        if (gameMode != "All")
             postfixUrl = "?gameMode=${gameMode.lowercase(Locale.getDefault())}"
 
         val userAddress = battleTag.replace('#', '-')
@@ -52,14 +52,14 @@ class OverbuffReader {
                 name = nickname,
                 gameMode = gameMode
             )
-        } catch (ex: IndexOutOfBoundsException){
+        } catch (ex: IndexOutOfBoundsException) {
             throw ParsingHTMLException(ex.localizedMessage)
-        } catch (ex: NumberFormatException){
+        } catch (ex: NumberFormatException) {
             throw ParsingHTMLException(ex.localizedMessage)
         }
     }
 
-    fun getSeparatePlayerStats(battleTag: String): List<OverwatchPlayerStats>{
+    fun getSeparatePlayerStats(battleTag: String): List<OverwatchPlayerStats> {
 
         val allGameModesStats = getPlayerStats(battleTag)
 
@@ -75,7 +75,7 @@ class OverbuffReader {
     private fun checkBattleTag(battleTag: String) {
         val regex = Regex("\\w{1,}#\\d{3,5}")
 
-        if(!(regex matches battleTag)){
+        if (!(regex matches battleTag)) {
             throw NotABattleTagException("$battleTag is not a valid battleTag")
         }
     }
