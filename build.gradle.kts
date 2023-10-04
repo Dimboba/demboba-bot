@@ -1,7 +1,10 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 plugins {
     kotlin("jvm") version "1.9.0"
 
     application
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
 group = "laz.dimboba"
@@ -38,8 +41,11 @@ tasks.test {
     useJUnitPlatform()
 }
 
-
-
 kotlin {
     jvmToolchain(8)
+}
+
+tasks.withType(ShadowJar::class.java) {
+    archiveBaseName.set("demboba-bot")
+ //   minimize()
 }
