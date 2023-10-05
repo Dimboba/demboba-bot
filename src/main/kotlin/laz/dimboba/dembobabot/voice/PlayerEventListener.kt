@@ -2,8 +2,74 @@ package laz.dimboba.dembobabot.voice
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer
 import com.sedmelluq.discord.lavaplayer.player.event.*
+import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack
+import dev.kord.core.entity.channel.MessageChannel
+import kotlinx.coroutines.runBlocking
+import mu.KotlinLogging
 
-class PlayerEventListener () : AudioEventListener {
+private val logger = KotlinLogging.logger { }
+
+class PlayerEventListener (
+    private val messageChannel: MessageChannel
+) : TrackSchedulerListener {
+
+    init {
+        logger.info {
+            "PlayerEventListener is started with channel: ${messageChannel.data.name}"
+        }
+    }
+
+    override fun onRepeat(isRepeating: Boolean) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onTrackSkip(skippedTrack: AudioTrack) {
+        runBlocking {
+            messageChannel.createMessage (
+                content = "Track ${skippedTrack.info.title} was skipped"
+            )
+        }
+    }
+
+    override fun onClearingQueue(previousQueue: List<AudioTrack>) {
+        runBlocking {
+            messageChannel.createMessage(
+                content = "${previousQueue.size} tracks was removed from queue"
+            )
+        }
+    }
+
+    override fun onLeave() {
+        runBlocking {
+            messageChannel.createMessage(
+                content = "Music player is shutdown"
+            )
+        }
+    }
+
+    override fun onAddTrack(track: AudioTrack) {
+        runBlocking {
+            messageChannel.createMessage(
+                content = "Add track: ${track.info.title}"
+            )
+        }
+    }
+
+    override fun onAddPlaylist(playlist: AudioPlaylist) {
+        runBlocking {
+            messageChannel.createMessage(
+                content = "Add ${playlist.tracks.size} tracks from ${playlist.name}"
+            )
+        }
+    }
+
+    override fun onNoMatches() {
+    }
+
+    override fun onLoadFailed() {
+    }
+
     override fun onEvent(event: AudioEvent) {
         when (event) {
             is PlayerPauseEvent -> onPlayerPause(event.player)
@@ -16,27 +82,27 @@ class PlayerEventListener () : AudioEventListener {
     }
 
     private fun onPlayerPause(player: AudioPlayer) {
-//        runBlocking {
-//            messageChannel?.createMessage(
-//                "Player was stopped"
-//            )
-//        }
+        runBlocking {
+            messageChannel.createMessage(
+                "Player was stopped"
+            )
+        }
     }
 
     private fun onPlayerResume(player: AudioPlayer) {
-//        runBlocking {
-//            messageChannel?.createMessage(
-//                "Continue playing: ${player.playingTrack.info.title}"
-//            )
-//        }
+        runBlocking {
+            messageChannel.createMessage(
+                "Continue playing: ${player.playingTrack.info.title}"
+            )
+        }
     }
 
     private fun onTrackStart(player: AudioPlayer) {
-//        runBlocking {
-//            messageChannel?.createMessage(
-//                "Playing track: ${player.playingTrack.info.title}"
-//            )
-//        }
+        runBlocking {
+            messageChannel.createMessage(
+                "Playing track: ${player.playingTrack.info.title}"
+            )
+        }
     }
 
     private fun onTrackEnd(player: AudioPlayer) {

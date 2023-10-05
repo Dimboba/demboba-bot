@@ -10,14 +10,13 @@ import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack
 import dev.kord.common.annotation.KordVoice
 import dev.kord.core.behavior.channel.BaseVoiceChannelBehavior
-import dev.kord.core.behavior.channel.MessageChannelBehavior
-import dev.kord.core.behavior.reply
 import dev.kord.core.entity.Guild
 import dev.kord.core.entity.Message
 import dev.kord.voice.AudioFrame
 import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
-import java.lang.Integer.min
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -25,15 +24,15 @@ import kotlin.coroutines.suspendCoroutine
 //TODO: end refactoring (all messages to a new class)
 private val logger = KotlinLogging.logger { }
 
-class TrackScheduler(
+class TrackScheduler (
     private val voiceConnectionsHandler: VoiceConnectionsHandler
 ) : AudioEventListener {
 
     private val lavaplayerManager = DefaultAudioPlayerManager()
     private val audioTrackQueue = ArrayList<AudioTrack>()
     private val player = lavaplayerManager.createPlayer()
+    private val listeners = ArrayList<TrackSchedulerListener>()
     private var repeat: AudioTrack? = null
-
     private var voiceGuild: Guild? = null
 
     init {
@@ -46,33 +45,21 @@ class TrackScheduler(
         }
     }
 
-    // interactions
+    fun addListener(listener: TrackSchedulerListener) {
+        listeners.add(listener)
+        player.addListener(listener)
 
-    fun showQueue(message: Message) {
-        if (audioTrackQueue.isEmpty()) {
-            runBlocking {
-                message.reply {
-                    content = "Queue is empty"
-                }
-            }
-            return
+        logger.info {
+            "Add listener: ${listener::class.simpleName}"
         }
-
-        var answer: String = "There is ${audioTrackQueue.size} tracks in queue \n" +
-                "First ${min(audioTrackQueue.size, 10)} tracks are: \n"
-        for (i in 0..<min(audioTrackQueue.size, 10)) {
-            answer += ("-) ${audioTrackQueue[i].info.title} \n")
-        }
-
-
-//        runBlocking {
-//            message.reply {
-//                content = answer
-//            }
-//        }
     }
 
+    // interactions
     //TODO: fix because track's state = FINISHED
+
+    fun getQueue(): ArrayList<AudioTrack> {
+        return ArrayList(audioTrackQueue)
+    }
     fun repeat(message: Message) {
         val answer: String
         if (repeat != null) {
@@ -86,35 +73,22 @@ class TrackScheduler(
                 answer = "Repeating track: ${player.playingTrack.info.title}"
             }
         }
-
-//        runBlocking {
-//            messageChannel?.createMessage(
-//                content = answer
-//            )
-//        }
-    }
+}
 
     fun nextSong() {
-//
-//        runBlocking {
-//            message.reply {
-//                content = "Track ${player.playingTrack.info.title} was skipped"
-//            }
-//        }
-
+        val track = player.playingTrack
         player.stopTrack()
-
+        listeners.forEach {
+            listener -> listener.onTrackSkip(track)
+        }
     }
 
     fun emptyQueue() {
-        val size = audioTrackQueue.size
+        val queue = ArrayList(audioTrackQueue)
         audioTrackQueue.clear()
-
-//        runBlocking {
-//            message.reply {
-//                content = "$size tracks was removed from queue"
-//            }
-//        }
+        listeners.forEach {
+            listener -> listener.onClearingQueue(queue)
+        }
     }
 
     fun pause() {
@@ -125,9 +99,9 @@ class TrackScheduler(
     suspend fun leave() {
         voiceGuild?.id?.let { voiceConnectionsHandler.closeConnections(it) }
         audioTrackQueue.clear()
-//        message.reply {
-//            content = "Music player is shutdown"
-//        }
+        listeners.forEach {
+            listener -> listener.onLeave()
+        }
     }
 
     @OptIn(KordVoice::class)
@@ -161,7 +135,6 @@ class TrackScheduler(
         } catch (ex: Exception) {
             logger.error(ex) { "Failed to connect to VoiceChannel" }
             //TODO: refactor, just for test
-            println("error while voice connecting")
             throw Exception(ex.localizedMessage)
         }
     }
@@ -180,27 +153,12 @@ class TrackScheduler(
     }
 
     private fun onPlayerPause(player: AudioPlayer) {
-//        runBlocking {
-//            messageChannel?.createMessage(
-//                "Player was stopped"
-//            )
-//        }
     }
 
     private fun onPlayerResume(player: AudioPlayer) {
-//        runBlocking {
-//            messageChannel?.createMessage(
-//                "Continue playing: ${player.playingTrack.info.title}"
-//            )
-//        }
     }
 
     private fun onTrackStart(player: AudioPlayer) {
-//        runBlocking {
-//            messageChannel?.createMessage(
-//                "Playing track: ${player.playingTrack.info.title}"
-//            )
-//        }
     }
 
     private fun onTrackEnd(player: AudioPlayer) {
@@ -272,38 +230,50 @@ class TrackScheduler(
         query: String,
         isSearch: Boolean = false
     ) {
-        val messageContent = suspendCoroutine<String> {
+        //TODO: maybe fix coroutine call (ask Ars)
+        suspendCoroutine {
             this.loadItem(query, object : AudioLoadResultHandler {
                 override fun trackLoaded(track: AudioTrack) {
                     queue(track)
-                    it.resume("Add track: ${track.info.title}")
+                    listeners.forEach {
+                        listener -> listener.onAddTrack(track)
+                    }
+                    it.resume(true)
                 }
 
                 override fun playlistLoaded(playlist: AudioPlaylist) {
                     if (isSearch) {
+                        println("here")
                         queue(playlist.tracks.first())
-                        it.resume("Add track: ${playlist.tracks.first().info.title}")
+                        listeners.forEach {
+                            listener -> listener.onAddTrack(playlist.tracks.first())
+                        }
+                        it.resume(true)
                         return
                     }
                     queueList(playlist)
-                    it.resume("Add ${playlist.tracks.size} tracks from ${playlist.name}")
+                    listeners.forEach {
+                        listener -> listener.onAddPlaylist(playlist)
+                    }
+                    it.resume(true)
                 }
 
-
                 override fun noMatches() {
-                    it.resume("There is no such tracks")
+                    listeners.forEach {
+                        listener -> listener.onNoMatches()
+                    }
+                    it.resume(true)
                 }
 
                 override fun loadFailed(exception: FriendlyException?) {
                     logger.error(exception) { "Failed to load, query: $query" }
-                    it.resume("An error occurred")
+                    listeners.forEach {
+                        listener -> listener.onLoadFailed()
+                    }
+                    it.resume(true)
                 }
             })
         }
-
-//        message.reply {
-//            content = messageContent
-//        }
     }
 }
 

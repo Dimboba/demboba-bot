@@ -9,7 +9,7 @@ import laz.dimboba.dembobabot.exceptions.NotACommandMessageException
 import laz.dimboba.dembobabot.voice.TrackScheduler
 import java.util.*
 
-class MusicMessageEventHandler(
+class MusicMessageEventHandler (
     private val trackScheduler: TrackScheduler
 ) : MessageEventHandler {
     private var currMessage: Message? = null

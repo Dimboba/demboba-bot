@@ -34,8 +34,7 @@ class MessageHandler(
         }
         val args = parseCommand(messageCreateEvent.message.content)
         for (handler in eventHandlers) {
-            println(handler.commandsUpperCase)
-            if (handler.commandsUpperCase.contains(args[0].substring(1, args[0].length))) {
+            if (handler.commandsUpperCase.contains(args[0].substring(1, args[0].length).uppercase(Locale.getDefault()))) {
                 handler.handleMessage(
                     messageCreateEvent,
                     args
@@ -48,7 +47,6 @@ class MessageHandler(
 
     private fun parseCommand(messageContent: String) : List<String> {
         val content = messageContent.replace("-", "_")
-            .uppercase(Locale.getDefault())
             .split(" ")
         if(content.isEmpty())
             throw NotACommandMessageException("Message: there is no commands")

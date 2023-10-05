@@ -1,6 +1,7 @@
 package laz.dimboba.dembobabot.controller.impl.enums
 
 import dev.kord.core.entity.Message
+import kotlinx.coroutines.runBlocking
 import laz.dimboba.dembobabot.exceptions.CannotFindMemberException
 import laz.dimboba.dembobabot.voice.TrackScheduler
 
@@ -38,7 +39,13 @@ enum class MusicCommand {
     },
     QUEUE {
         override suspend fun exec(trackScheduler: TrackScheduler, args: List<String>, message: Message) {
-            //trackScheduler.showQueue()
+            runBlocking {
+                message.channel.createMessage(
+                    trackScheduler.getQueue().joinToString { track ->
+                        track.info.title + '\n'
+                    }
+                )
+            }
         }
     },
     CLEAR {

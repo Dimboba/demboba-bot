@@ -7,11 +7,13 @@ import dev.kord.gateway.Intent
 import dev.kord.gateway.PrivilegedIntent
 import kotlinx.coroutines.flow.first
 import laz.dimboba.dembobabot.channel.ChannelHandler
+import laz.dimboba.dembobabot.channel.MessageChannelType
 import laz.dimboba.dembobabot.controller.MessageHandler
 import laz.dimboba.dembobabot.controller.impl.ChannelMessageEventHandler
 import laz.dimboba.dembobabot.controller.impl.MusicMessageEventHandler
 import laz.dimboba.dembobabot.controller.impl.SimpleMessageEventHandler
 import laz.dimboba.dembobabot.exceptions.UnknownCommandException
+import laz.dimboba.dembobabot.voice.PlayerEventListener
 import laz.dimboba.dembobabot.voice.TrackScheduler
 import laz.dimboba.dembobabot.voice.VoiceConnectionsHandler
 
@@ -20,10 +22,16 @@ suspend fun main(args: Array<String>) {
     val token: String = System.getenv("discord_token") ?: "null-token"
 
     val kord = Kord(token)
-    val voiceConnectionsHandler = VoiceConnectionsHandler()
-    val trackScheduler = TrackScheduler(voiceConnectionsHandler)
     //TODO: better search for serverGuild
     val channelHandler = ChannelHandler(kord.guilds.first())
+    val voiceConnectionsHandler = VoiceConnectionsHandler()
+    val trackScheduler = TrackScheduler(voiceConnectionsHandler)
+
+    val musicMessageChannel = channelHandler.getTextMessageChannelInstance(
+        "Music"
+    )
+    val playerEventListener = PlayerEventListener(musicMessageChannel)
+    trackScheduler.addListener(playerEventListener)
 
     val simpleMessageEventHandler = SimpleMessageEventHandler()
     val musicMessageEventHandler = MusicMessageEventHandler(trackScheduler)

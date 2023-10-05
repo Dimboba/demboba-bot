@@ -3,6 +3,7 @@ package laz.dimboba.dembobabot.channel
 import dev.kord.common.entity.ChannelType
 import dev.kord.core.behavior.*
 import dev.kord.core.entity.channel.Category
+import dev.kord.core.entity.channel.MessageChannel
 import dev.kord.core.entity.channel.TopGuildChannel
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.flow.firstOrNull
@@ -20,12 +21,11 @@ class ChannelHandler (
         }
     }
 
-    suspend fun createChannelIfNotExist(name: String, type: MessageChannelType, categoryName: String? = null) {
+    suspend fun createChannelIfNotExist (
+        name: String,
+        type: MessageChannelType,
+        categoryName: String? = null): MessageChannel {
         val parentGuild = findCategoryByName(categoryName)
-
-        println(serverGuild.id)
-
-
         val channelName = name.trim()
         if (serverGuild.channels.firstOrNull { channel ->
                 channel.name == channelName
@@ -35,7 +35,7 @@ class ChannelHandler (
             throw GuildAlreadyExists("There is channel with name: $channelName")
         }
 
-        when (type) {
+        return when (type) {
             MessageChannelType.TEXT -> serverGuild.createTextChannel(
                 channelName
             ) {
@@ -56,20 +56,34 @@ class ChannelHandler (
         }
     }
 
-    suspend fun createCategoryIfNotExist(name: String) {
+    suspend fun createCategoryIfNotExist(name: String) : Category {
         val channelName = name.trim()
         if (serverGuild.channels.firstOrNull { channel ->
                 channel.name == channelName && channel.type == ChannelType.GuildCategory
             } != null) {
             throw GuildAlreadyExists("There is category with name: $channelName")
         }
-        serverGuild.createCategory(channelName)
+        return serverGuild.createCategory(channelName)
     }
 
     suspend fun deleteChannelIfExist(name: String, category: Category? = null) {
         val parentGuild = category?.guild ?: serverGuild
+        TODO("Not implemented yet")
     }
 
+    suspend fun getTextMessageChannelInstance(
+        channelName: String,
+        categoryName: String? = null): MessageChannel {
+        return serverGuild.channels.firstOrNull { channel ->
+                channel.name == channelName
+                        && channel.type == ChannelType.GuildText
+                        && channel.data.parentId?.value == findCategoryByName(categoryName)?.id
+            } as MessageChannel? ?: return createChannelIfNotExist(
+                channelName,
+                MessageChannelType.TEXT,
+                categoryName
+            )
+    }
     private suspend fun findCategoryByName(name: String?): TopGuildChannel? {
         println(name)
         if (name == null) return null
