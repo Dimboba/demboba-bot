@@ -76,8 +76,8 @@ class ChannelHandler (
         categoryName: String? = null): MessageChannel {
         return serverGuild.channels.firstOrNull { channel ->
                 channel.name == channelName
-                        && channel.type == ChannelType.GuildText
-                        && channel.data.parentId?.value == findCategoryByName(categoryName)?.id
+                && channel.type == ChannelType.GuildText
+                && channel.data.parentId?.value == findCategoryByName(categoryName)?.id
             } as MessageChannel? ?: return createChannelIfNotExist(
                 channelName,
                 MessageChannelType.TEXT,
@@ -85,7 +85,7 @@ class ChannelHandler (
             )
     }
     private suspend fun findCategoryByName(name: String?): TopGuildChannel? {
-        println(name)
+        //println(name)
         if (name == null) return null
         return serverGuild.channels.firstOrNull { channel ->
             channel.name.equals(name.trim(), ignoreCase = true)

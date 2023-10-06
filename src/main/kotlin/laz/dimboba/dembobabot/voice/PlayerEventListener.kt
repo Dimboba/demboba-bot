@@ -16,7 +16,7 @@ class PlayerEventListener (
 
     init {
         logger.info {
-            "PlayerEventListener is started with channel: ${messageChannel.data.name}"
+            "PlayerEventListener is started with channel: ${messageChannel.data.name.value}"
         }
     }
 

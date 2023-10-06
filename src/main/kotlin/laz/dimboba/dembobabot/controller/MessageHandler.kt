@@ -34,7 +34,11 @@ class MessageHandler(
         }
         val args = parseCommand(messageCreateEvent.message.content)
         for (handler in eventHandlers) {
-            if (handler.commandsUpperCase.contains(args[0].substring(1, args[0].length).uppercase(Locale.getDefault()))) {
+            //TODO: better test if command is acceptable (not just name) (new method in interface)
+            if (handler.isCommandAcceptable(
+                args[0].substring(1, args[0].length),
+                messageCreateEvent
+            )) {
                 handler.handleMessage(
                     messageCreateEvent,
                     args

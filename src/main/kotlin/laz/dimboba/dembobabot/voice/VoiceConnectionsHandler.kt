@@ -14,25 +14,25 @@ class VoiceConnectionsHandler {
     private val connections: MutableMap<Snowflake, VoiceConnection> = mutableMapOf()
 
     @OptIn(KordVoice::class)
-    suspend fun closeConnections(guildId: Snowflake) {
-        if (connections.contains(guildId)) {
-            connections.remove(guildId)!!.shutdown()
+    suspend fun closeConnections(id: Snowflake) {
+        if (connections.contains(id)) {
+            connections.remove(id)!!.shutdown()
         }
     }
 
     @OptIn(KordVoice::class)
     suspend fun connect(
         channelBehavior: BaseVoiceChannelBehavior,
-        guildId: Snowflake,
+        id: Snowflake,
         builder: VoiceConnectionBuilder.() -> Unit
     ): VoiceConnection {
         val connection = channelBehavior.connect(builder)
-        connections[guildId] = connection
+        connections[id] = connection
         return connection
     }
 
     @OptIn(KordVoice::class)
     fun isConnected(
-        guildId: Snowflake
-    ) = connections.keys.contains(guildId)
+        id: Snowflake
+    ) = connections.keys.contains(id)
 }

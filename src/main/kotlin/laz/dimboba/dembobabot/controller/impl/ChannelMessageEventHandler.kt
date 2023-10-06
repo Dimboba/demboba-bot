@@ -7,16 +7,23 @@ import laz.dimboba.dembobabot.controller.MessageEventHandler
 import laz.dimboba.dembobabot.controller.impl.enums.ChannelCommand
 import laz.dimboba.dembobabot.controller.impl.enums.SimpleCommand
 import laz.dimboba.dembobabot.exceptions.NotACommandMessageException
+import java.lang.IllegalArgumentException
 import java.util.*
 
 class ChannelMessageEventHandler(
     private val channelHandler: ChannelHandler
 ) : MessageEventHandler {
+
     private var currMessage: Message? = null
-    override val commandsUpperCase: List<String> =
-        ChannelCommand.entries.map {
-                command -> command.name
+    override suspend fun isCommandAcceptable(command: String, messageEvent: MessageCreateEvent): Boolean {
+        try {
+            ChannelCommand.valueOf(command.uppercase(Locale.getDefault()))
+        } catch (_: IllegalArgumentException) {
+            return false
         }
+        return true
+    }
+
     override suspend fun handleMessage(messageEvent: MessageCreateEvent, args: List<String>) {
         currMessage = messageEvent.message
 

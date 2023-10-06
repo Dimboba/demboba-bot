@@ -33,7 +33,8 @@ class TrackScheduler (
     private val player = lavaplayerManager.createPlayer()
     private val listeners = ArrayList<TrackSchedulerListener>()
     private var repeat: AudioTrack? = null
-    private var voiceGuild: Guild? = null
+    var voiceGuild: BaseVoiceChannelBehavior? = null
+        private set
 
     init {
         //lavaplayerManager.registerSourceManager(YoutubeAudioSourceManager())
@@ -102,6 +103,7 @@ class TrackScheduler (
         listeners.forEach {
             listener -> listener.onLeave()
         }
+        voiceGuild = null
     }
 
     @OptIn(KordVoice::class)
@@ -113,20 +115,20 @@ class TrackScheduler (
         if (searchString.trim().isNotEmpty())
             loadYTSong(searchString)
 
-        if (voiceConnectionsHandler.isConnected(messageGuild.id)) {
+        if (voiceConnectionsHandler.isConnected(channel.id)) {
             if (searchString.trim().isEmpty() && player.isPaused)
                 player.isPaused = false
             return
         }
 
-        voiceGuild = messageGuild
+        voiceGuild = channel
         player.playTrack(audioTrackQueue.removeFirst())
 
         try {
-            voiceConnectionsHandler.closeConnections(messageGuild.id)
+            voiceConnectionsHandler.closeConnections(channel.id)
             voiceConnectionsHandler.connect(
                 channelBehavior = channel,
-                guildId = messageGuild.id
+                id = channel.id
             ) {
                 audioProvider {
                     AudioFrame.fromData(player.provide()?.data)
@@ -243,7 +245,6 @@ class TrackScheduler (
 
                 override fun playlistLoaded(playlist: AudioPlaylist) {
                     if (isSearch) {
-                        println("here")
                         queue(playlist.tracks.first())
                         listeners.forEach {
                             listener -> listener.onAddTrack(playlist.tracks.first())

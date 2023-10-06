@@ -5,6 +5,7 @@ import dev.kord.core.event.message.MessageCreateEvent
 import dev.kord.core.on
 import dev.kord.gateway.Intent
 import dev.kord.gateway.PrivilegedIntent
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.flow.first
 import laz.dimboba.dembobabot.channel.ChannelHandler
 import laz.dimboba.dembobabot.channel.MessageChannelType
@@ -17,6 +18,7 @@ import laz.dimboba.dembobabot.voice.PlayerEventListener
 import laz.dimboba.dembobabot.voice.TrackScheduler
 import laz.dimboba.dembobabot.voice.VoiceConnectionsHandler
 
+private val logger = KotlinLogging.logger { }
 suspend fun main(args: Array<String>) {
 
     val token: String = System.getenv("discord_token") ?: "null-token"
@@ -26,15 +28,12 @@ suspend fun main(args: Array<String>) {
     val channelHandler = ChannelHandler(kord.guilds.first())
     val voiceConnectionsHandler = VoiceConnectionsHandler()
     val trackScheduler = TrackScheduler(voiceConnectionsHandler)
-
     val musicMessageChannel = channelHandler.getTextMessageChannelInstance(
-        "Music"
+        "dembobadj"
     )
-    val playerEventListener = PlayerEventListener(musicMessageChannel)
-    trackScheduler.addListener(playerEventListener)
 
     val simpleMessageEventHandler = SimpleMessageEventHandler()
-    val musicMessageEventHandler = MusicMessageEventHandler(trackScheduler)
+    val musicMessageEventHandler = MusicMessageEventHandler(trackScheduler, musicMessageChannel)
     val channelMessageEventHandler = ChannelMessageEventHandler(channelHandler)
     val messageHandler = MessageHandler(
         listOf(
@@ -65,8 +64,6 @@ suspend fun main(args: Array<String>) {
         // ignore other bots, even ourselves. We only serve humans here!
         if (message.author?.isBot != false) return@on
 
-        println(message.content)
-
 //        try {
 //            if (message.content == "!create") {
 //                channelHandler.createChannelIfNotExist("music", ChannelType.VOICE)
@@ -83,7 +80,7 @@ suspend fun main(args: Array<String>) {
             )
             return@on
         } catch (ex: Exception) {
-            //error(ex.localizedMessage)
+            logger.error(ex) {}
             return@on
         }
 
