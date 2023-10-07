@@ -2,20 +2,25 @@ package laz.dimboba.dembobabot.channel
 
 import dev.kord.common.entity.ChannelType
 import dev.kord.core.behavior.*
+import dev.kord.core.entity.Guild
 import dev.kord.core.entity.channel.Category
 import dev.kord.core.entity.channel.MessageChannel
 import dev.kord.core.entity.channel.TopGuildChannel
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.flow.firstOrNull
 import laz.dimboba.dembobabot.exceptions.GuildAlreadyExists
+import org.koin.core.annotation.Singleton
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import org.koin.core.qualifier.named
 import java.util.*
 
 private val logger = KotlinLogging.logger { }
 
-class ChannelHandler (
-    private val serverGuild: GuildBehavior
-) {
+@Singleton
+class ChannelHandler : KoinComponent{
 
+    private val serverGuild: Guild by inject(named("ServerGuild"))
     init {
         logger.info {
             "ChannelHandler is started"

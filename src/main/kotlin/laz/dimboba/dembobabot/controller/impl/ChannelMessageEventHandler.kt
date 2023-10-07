@@ -7,13 +7,18 @@ import laz.dimboba.dembobabot.controller.MessageEventHandler
 import laz.dimboba.dembobabot.controller.impl.enums.ChannelCommand
 import laz.dimboba.dembobabot.controller.impl.enums.SimpleCommand
 import laz.dimboba.dembobabot.exceptions.NotACommandMessageException
+import org.koin.core.annotation.Named
+import org.koin.core.annotation.Singleton
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import java.lang.IllegalArgumentException
 import java.util.*
 
-class ChannelMessageEventHandler(
-    private val channelHandler: ChannelHandler
-) : MessageEventHandler {
+@Singleton
+@Named("ChannelMessageEventHandler")
+class ChannelMessageEventHandler : MessageEventHandler, KoinComponent {
 
+    private val channelHandler: ChannelHandler by inject()
     private var currMessage: Message? = null
     override suspend fun isCommandAcceptable(command: String, messageEvent: MessageCreateEvent): Boolean {
         try {

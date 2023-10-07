@@ -12,16 +12,23 @@ import laz.dimboba.dembobabot.exceptions.NotACommandMessageException
 import laz.dimboba.dembobabot.exceptions.UnknownCommandException
 import laz.dimboba.dembobabot.voice.PlayerEventListener
 import laz.dimboba.dembobabot.voice.TrackScheduler
+import org.koin.core.annotation.Named
+import org.koin.core.annotation.Singleton
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import org.koin.core.qualifier.named
 import java.lang.IllegalArgumentException
 import java.util.*
 
-class MusicMessageEventHandler (
-    private val trackScheduler: TrackScheduler,
-    private val messageChannel: MessageChannel
-) : MessageEventHandler {
+@Singleton
+@Named("MusicMessageEventHandler")
+class MusicMessageEventHandler : MessageEventHandler, KoinComponent {
+
+    private val trackScheduler: TrackScheduler by inject()
+    private val musicMessageChannel: MessageChannel by inject(named("MusicTextChannel"))
 
     init {
-        val playerEventListener = PlayerEventListener(messageChannel)
+        val playerEventListener = PlayerEventListener(musicMessageChannel)
         trackScheduler.addListener(playerEventListener)
     }
 
@@ -33,7 +40,7 @@ class MusicMessageEventHandler (
         } catch (_: IllegalArgumentException) {
             return false
         }
-        if(messageEvent.message.channel != messageChannel) {
+        if(messageEvent.message.channel != musicMessageChannel) {
             throw UnknownCommandException("Music should be played in other channel")
         }
         val voiceChannel = messageEvent

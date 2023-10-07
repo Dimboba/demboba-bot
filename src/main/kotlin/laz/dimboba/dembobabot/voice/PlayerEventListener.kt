@@ -7,9 +7,11 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack
 import dev.kord.core.entity.channel.MessageChannel
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
+import org.koin.core.annotation.Singleton
 
 private val logger = KotlinLogging.logger { }
 
+@Singleton
 class PlayerEventListener (
     private val messageChannel: MessageChannel
 ) : TrackSchedulerListener {

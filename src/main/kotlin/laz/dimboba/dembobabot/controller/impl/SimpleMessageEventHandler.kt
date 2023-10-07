@@ -6,12 +6,16 @@ import laz.dimboba.dembobabot.controller.MessageEventHandler
 import laz.dimboba.dembobabot.controller.impl.enums.ChannelCommand
 import laz.dimboba.dembobabot.controller.impl.enums.SimpleCommand
 import laz.dimboba.dembobabot.exceptions.NotACommandMessageException
+import org.koin.core.annotation.Named
+import org.koin.core.annotation.Singleton
 import java.lang.IllegalArgumentException
 import java.util.*
 
 
 //TODO: ErrorHandler
 
+@Singleton
+@Named("SimpleMessageEventHandler")
 class SimpleMessageEventHandler : MessageEventHandler {
     private var currMessage: Message? = null
 

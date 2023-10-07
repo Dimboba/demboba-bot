@@ -7,74 +7,58 @@ import dev.kord.gateway.Intent
 import dev.kord.gateway.PrivilegedIntent
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import laz.dimboba.dembobabot.channel.ChannelHandler
-import laz.dimboba.dembobabot.channel.MessageChannelType
 import laz.dimboba.dembobabot.controller.MessageHandler
 import laz.dimboba.dembobabot.controller.impl.ChannelMessageEventHandler
 import laz.dimboba.dembobabot.controller.impl.MusicMessageEventHandler
 import laz.dimboba.dembobabot.controller.impl.SimpleMessageEventHandler
 import laz.dimboba.dembobabot.exceptions.UnknownCommandException
-import laz.dimboba.dembobabot.voice.PlayerEventListener
 import laz.dimboba.dembobabot.voice.TrackScheduler
 import laz.dimboba.dembobabot.voice.VoiceConnectionsHandler
+import org.koin.core.annotation.Named
+import org.koin.core.annotation.Singleton
+import org.koin.core.context.startKoin
+import org.koin.core.logger.Level
+import org.koin.core.qualifier.named
+import org.koin.dsl.module
+import org.koin.ksp.generated.*
+
+var kord: Kord? = null
+    get() = field
+    set(value) {
+        field = value
+    }
 
 private val logger = KotlinLogging.logger { }
 suspend fun main(args: Array<String>) {
 
     val token: String = System.getenv("discord_token") ?: "null-token"
 
-    val kord = Kord(token)
-    //TODO: better search for serverGuild
-    val channelHandler = ChannelHandler(kord.guilds.first())
-    val voiceConnectionsHandler = VoiceConnectionsHandler()
-    val trackScheduler = TrackScheduler(voiceConnectionsHandler)
-    //TODO: create config for musicTextChannelId
-    val musicMessageChannel = channelHandler.getTextMessageChannelInstance(
-        "demboba-dj"
-    )
+    kord = Kord(token)
 
-    val simpleMessageEventHandler = SimpleMessageEventHandler()
-    val musicMessageEventHandler = MusicMessageEventHandler(trackScheduler, musicMessageChannel)
-    val channelMessageEventHandler = ChannelMessageEventHandler(channelHandler)
-    val messageHandler = MessageHandler(
-        listOf(
-            simpleMessageEventHandler,
-            musicMessageEventHandler,
-            channelMessageEventHandler
+    startKoin {
+        printLogger(Level.INFO)
+
+        modules(
+            VoiceModel().module,
+            OverwatchModel().module,
+            ControllerModel().module,
+            ChannelModel().module,
+            MainModel().module
         )
-    )
 
-    //получение каналов и групп каналов
-//    kord.guilds.first().channels.collect{
-    //     channel -> println(channel.name + "  " + channel.type)
-//    }
-//
-//    val generalChannel = kord.guilds
-//        .first()
-//        .channels
-//        .first { channel -> channel.name == "основной" || channel.name == "general" }
-    //kord.createGuildChatInputCommand()
+    }
 
-//    kord.guilds.collect {
-//        guild -> println(guild.name + " " + guild.applicationId)
-//    }
+    //TODO: better search for serverGuild
+    //TODO: create config for musicTextChannelId
 
-
-    kord.on<MessageCreateEvent> {
+    kord!!.on<MessageCreateEvent> {
 
         // ignore other bots, even ourselves. We only serve humans here!
         if (message.author?.isBot != false) return@on
-
-//        try {
-//            if (message.content == "!create") {
-//                channelHandler.createChannelIfNotExist("music", ChannelType.VOICE)
-//            }
-//        } catch (ex: GuildAlreadyExists) {
-//            ex.message?.let { message.channel.createMessage(it) }
-//        }
-
         try {
-            messageHandler.handleMessage(this)
+            MessageHandler().handleMessage(this)
         } catch (ex: UnknownCommandException) {
             message.channel.createMessage(
                 "В Политехе такому не учили :<"
@@ -87,9 +71,7 @@ suspend fun main(args: Array<String>) {
 
     }
 
-
-
-    kord.login {
+    kord!!.login {
         // we need to specify this to receive the content of messages
         @OptIn(PrivilegedIntent::class)
         intents += Intent.GuildMembers
