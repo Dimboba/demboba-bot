@@ -4,10 +4,12 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import laz.dimboba.dembobabot.exceptions.NotABattleTagException
 import laz.dimboba.dembobabot.exceptions.ParsingHTMLException
 import org.jsoup.Jsoup
+import org.koin.core.annotation.Singleton
 import java.util.*
 
 private val logger = KotlinLogging.logger { }
 
+@Singleton
 class OverbuffReader {
     private val address = "https://www.overbuff.com/players/"
 

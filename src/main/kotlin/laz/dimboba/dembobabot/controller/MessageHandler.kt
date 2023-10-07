@@ -4,14 +4,17 @@ import dev.kord.core.event.message.MessageCreateEvent
 import io.github.oshai.kotlinlogging.KotlinLogging
 import laz.dimboba.dembobabot.exceptions.NotACommandMessageException
 import laz.dimboba.dembobabot.exceptions.UnknownCommandException
-import java.util.*
+import org.koin.core.annotation.Singleton
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 private val logger = KotlinLogging.logger { }
 
-class MessageHandler(
-    private val eventHandlers: List<MessageEventHandler>,
+@Singleton
+class MessageHandler : KoinComponent {
+    private val eventHandlers: List<MessageEventHandler> by lazy { getKoin().getAll<MessageEventHandler>() }
+
     private val commandChar: Char = '!'
-) {
     init {
         logger.info {
             "MessageHandler is started"

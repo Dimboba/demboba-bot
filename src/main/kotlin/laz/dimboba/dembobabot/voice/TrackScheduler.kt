@@ -17,6 +17,9 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
+import org.koin.core.annotation.Singleton
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -24,9 +27,12 @@ import kotlin.coroutines.suspendCoroutine
 //TODO: end refactoring (all messages to a new class)
 private val logger = KotlinLogging.logger { }
 
+@Singleton
 class TrackScheduler (
-    private val voiceConnectionsHandler: VoiceConnectionsHandler
-) : AudioEventListener {
+) : AudioEventListener, KoinComponent {
+
+
+    private val voiceConnectionsHandler: VoiceConnectionsHandler by inject()
 
     private val lavaplayerManager = DefaultAudioPlayerManager()
     private val audioTrackQueue = ArrayList<AudioTrack>()

@@ -6,10 +6,22 @@ import dev.kord.core.behavior.channel.BaseVoiceChannelBehavior
 import dev.kord.core.behavior.channel.connect
 import dev.kord.voice.VoiceConnection
 import dev.kord.voice.VoiceConnectionBuilder
+import io.github.oshai.kotlinlogging.KotlinLogging
+import org.koin.core.annotation.Singleton
 
 //TODO: check if channel is empty
 
+private val logger = KotlinLogging.logger { }
+
+@Singleton
 class VoiceConnectionsHandler {
+
+    init {
+        logger.info {
+            "VoiceConnectionHandler is started"
+        }
+    }
+
     @OptIn(KordVoice::class)
     private val connections: MutableMap<Snowflake, VoiceConnection> = mutableMapOf()
 
