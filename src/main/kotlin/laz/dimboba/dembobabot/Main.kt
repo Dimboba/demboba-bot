@@ -28,8 +28,9 @@ suspend fun main(args: Array<String>) {
     val channelHandler = ChannelHandler(kord.guilds.first())
     val voiceConnectionsHandler = VoiceConnectionsHandler()
     val trackScheduler = TrackScheduler(voiceConnectionsHandler)
+    //TODO: create config for musicTextChannelId
     val musicMessageChannel = channelHandler.getTextMessageChannelInstance(
-        "dembobadj"
+        "demboba-dj"
     )
 
     val simpleMessageEventHandler = SimpleMessageEventHandler()

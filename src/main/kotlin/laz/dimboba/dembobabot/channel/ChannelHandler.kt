@@ -8,6 +8,7 @@ import dev.kord.core.entity.channel.TopGuildChannel
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.flow.firstOrNull
 import laz.dimboba.dembobabot.exceptions.GuildAlreadyExists
+import java.util.*
 
 private val logger = KotlinLogging.logger { }
 
@@ -26,7 +27,7 @@ class ChannelHandler (
         type: MessageChannelType,
         categoryName: String? = null): MessageChannel {
         val parentGuild = findCategoryByName(categoryName)
-        val channelName = name.trim()
+        val channelName = name.trim().lowercase(Locale.getDefault())
         if (serverGuild.channels.firstOrNull { channel ->
                 channel.name == channelName
                         && channel.type == type.kordType
@@ -34,7 +35,6 @@ class ChannelHandler (
             } != null) {
             throw GuildAlreadyExists("There is channel with name: $channelName")
         }
-
         return when (type) {
             MessageChannelType.TEXT -> serverGuild.createTextChannel(
                 channelName

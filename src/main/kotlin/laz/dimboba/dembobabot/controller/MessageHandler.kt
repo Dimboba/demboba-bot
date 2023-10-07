@@ -50,14 +50,16 @@ class MessageHandler(
     }
 
     private fun parseCommand(messageContent: String) : List<String> {
-        val content = messageContent.replace("-", "_")
-            .split(" ")
+        val content = messageContent.split(" ").toMutableList()
         if(content.isEmpty())
             throw NotACommandMessageException("Message: there is no commands")
+
+        content[0] = content[0].replace("-", "_")
 
         if (content[0].length < 2 || content[0][0] != commandChar)
             throw NotACommandMessageException("Message: \"${content[0]}\" is not a command")
 
+        println(content)
         return content
     }
 }
