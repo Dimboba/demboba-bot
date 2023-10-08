@@ -22,13 +22,11 @@ import org.koin.core.context.startKoin
 import org.koin.core.logger.Level
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import org.koin.java.KoinJavaComponent.getKoin
+import org.koin.java.KoinJavaComponent.inject
 import org.koin.ksp.generated.*
 
 var kord: Kord? = null
-    get() = field
-    set(value) {
-        field = value
-    }
 
 private val logger = KotlinLogging.logger { }
 suspend fun main(args: Array<String>) {
@@ -52,20 +50,22 @@ suspend fun main(args: Array<String>) {
 
     //TODO: better search for serverGuild
     //TODO: create config for musicTextChannelId
-
+    val messageHandler = getKoin().get<MessageHandler>()
     kord!!.on<MessageCreateEvent> {
 
         // ignore other bots, even ourselves. We only serve humans here!
         if (message.author?.isBot != false) return@on
         try {
-            MessageHandler().handleMessage(this)
+            messageHandler.handleMessage(this)
         } catch (ex: UnknownCommandException) {
             message.channel.createMessage(
                 "В Политехе такому не учили :<"
             )
             return@on
         } catch (ex: Exception) {
-            logger.error(ex) {}
+            logger.error {
+                ex.message
+            }
             return@on
         }
 

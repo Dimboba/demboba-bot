@@ -40,6 +40,6 @@ class MainModel {
     @Singleton
     @Named("ServerGuild")
     fun serverGuild() = runBlocking {
-        kord!!.guilds.first().also { println("hello") }
+        kord!!.guilds.first()
     }
 }

@@ -37,7 +37,6 @@ class MessageHandler : KoinComponent {
         }
         val args = parseCommand(messageCreateEvent.message.content)
         for (handler in eventHandlers) {
-            //TODO: better test if command is acceptable (not just name) (new method in interface)
             if (handler.isCommandAcceptable(
                 args[0].substring(1, args[0].length),
                 messageCreateEvent
@@ -62,7 +61,6 @@ class MessageHandler : KoinComponent {
         if (content[0].length < 2 || content[0][0] != commandChar)
             throw NotACommandMessageException("Message: \"${content[0]}\" is not a command")
 
-        println(content)
         return content
     }
 }

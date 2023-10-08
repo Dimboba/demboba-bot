@@ -18,7 +18,9 @@ enum class ChannelCommand {
     DELETE_CHANNEL {
         override suspend fun exec(channelHandler: ChannelHandler, args: List<String>) {
             channelHandler.deleteChannelIfExist(
-                name = args[1]
+                name = args[2],
+                type = MessageChannelType.valueOf(args[1].uppercase(Locale.getDefault())),
+                categoryName = if (args.size > 3) args[3] else null
             )
         }
     },

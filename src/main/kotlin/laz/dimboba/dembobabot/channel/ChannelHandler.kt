@@ -71,9 +71,19 @@ class ChannelHandler : KoinComponent{
         return serverGuild.createCategory(channelName)
     }
 
-    suspend fun deleteChannelIfExist(name: String, category: Category? = null) {
-        val parentGuild = category?.guild ?: serverGuild
-        TODO("Not implemented yet")
+    suspend fun deleteChannelIfExist (
+        name: String,
+        type:MessageChannelType,
+        categoryName: String? = null) {
+        val parentGuild = findCategoryByName(categoryName)
+        val channelName = name.trim().lowercase(Locale.getDefault())
+
+        val channel = serverGuild.channels.firstOrNull { channel ->
+            channel.name == channelName
+                    && channel.type == type.kordType
+                    && channel.data.parentId?.value == parentGuild?.id
+        }
+        channel?.delete()
     }
 
     suspend fun getTextMessageChannelInstance(
