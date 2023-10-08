@@ -1,7 +1,10 @@
 package laz.dimboba.dembobabot.channel
 
 import dev.kord.common.entity.ChannelType
-import dev.kord.core.behavior.*
+import dev.kord.core.behavior.createCategory
+import dev.kord.core.behavior.createNewsChannel
+import dev.kord.core.behavior.createTextChannel
+import dev.kord.core.behavior.createVoiceChannel
 import dev.kord.core.entity.Guild
 import dev.kord.core.entity.channel.Category
 import dev.kord.core.entity.channel.MessageChannel
@@ -19,19 +22,21 @@ private val logger = KotlinLogging.logger { }
 
 //TODO: Exception if Category does not exist
 @Singleton
-class ChannelHandler : KoinComponent{
+class ChannelHandler : KoinComponent {
 
     private val serverGuild: Guild by inject(named("ServerGuild"))
+
     init {
         logger.info {
             "ChannelHandler is started"
         }
     }
 
-    suspend fun createChannelIfNotExist (
+    suspend fun createChannelIfNotExist(
         name: String,
         type: MessageChannelType,
-        categoryName: String? = null): MessageChannel {
+        categoryName: String? = null
+    ): MessageChannel {
         val parentGuild = findCategoryByName(categoryName)
         val channelName = name.trim().lowercase(Locale.getDefault())
         if (serverGuild.channels.firstOrNull { channel ->
@@ -62,7 +67,7 @@ class ChannelHandler : KoinComponent{
         }
     }
 
-    suspend fun createCategoryIfNotExist(name: String) : Category {
+    suspend fun createCategoryIfNotExist(name: String): Category {
         val channelName = name.trim()
         if (serverGuild.channels.firstOrNull { channel ->
                 channel.name == channelName && channel.type == ChannelType.GuildCategory
@@ -72,10 +77,11 @@ class ChannelHandler : KoinComponent{
         return serverGuild.createCategory(channelName)
     }
 
-    suspend fun deleteChannelIfExist (
+    suspend fun deleteChannelIfExist(
         name: String,
-        type:MessageChannelType,
-        categoryName: String? = null) {
+        type: MessageChannelType,
+        categoryName: String? = null
+    ) {
         val parentGuild = findCategoryByName(categoryName)
         val channelName = name.trim().lowercase(Locale.getDefault())
 
@@ -87,10 +93,10 @@ class ChannelHandler : KoinComponent{
         channel?.delete()
     }
 
-    suspend fun deleteCategoryIfExist (name:String) {
+    suspend fun deleteCategoryIfExist(name: String) {
         val category = findCategoryByName(name) ?: return
-        if (serverGuild.channels.firstOrNull {channel ->
-            channel.data.parentId?.value == category.id
+        if (serverGuild.channels.firstOrNull { channel ->
+                channel.data.parentId?.value == category.id
             } != null) {
             return
         }
@@ -99,17 +105,19 @@ class ChannelHandler : KoinComponent{
 
     suspend fun getTextMessageChannelInstance(
         channelName: String,
-        categoryName: String? = null): MessageChannel {
+        categoryName: String? = null
+    ): MessageChannel {
         return serverGuild.channels.firstOrNull { channel ->
-                channel.name == channelName
-                && channel.type == ChannelType.GuildText
-                && channel.data.parentId?.value == findCategoryByName(categoryName)?.id
-            } as MessageChannel? ?: return createChannelIfNotExist(
-                channelName,
-                MessageChannelType.TEXT,
-                categoryName
-            )
+            channel.name == channelName
+                    && channel.type == ChannelType.GuildText
+                    && channel.data.parentId?.value == findCategoryByName(categoryName)?.id
+        } as MessageChannel? ?: return createChannelIfNotExist(
+            channelName,
+            MessageChannelType.TEXT,
+            categoryName
+        )
     }
+
     private suspend fun findCategoryByName(name: String?): TopGuildChannel? {
         //println(name)
         if (name == null) return null

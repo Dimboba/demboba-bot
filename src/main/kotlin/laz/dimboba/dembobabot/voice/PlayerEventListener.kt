@@ -18,6 +18,7 @@ private val logger = KotlinLogging.logger { }
 class PlayerEventListener : TrackSchedulerListener, KoinComponent {
 
     private val messageChannel: MessageChannel by inject(named("MusicTextChannel"))
+
     init {
         logger.info {
             "PlayerEventListener is started with channel: ${messageChannel.data.name.value}"
@@ -30,7 +31,7 @@ class PlayerEventListener : TrackSchedulerListener, KoinComponent {
 
     override fun onTrackSkip(skippedTrack: AudioTrack) {
         runBlocking {
-            messageChannel.createMessage (
+            messageChannel.createMessage(
                 content = "Track ${skippedTrack.info.title} was skipped"
             )
         }

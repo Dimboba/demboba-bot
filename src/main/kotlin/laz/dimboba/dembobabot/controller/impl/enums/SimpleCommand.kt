@@ -54,6 +54,7 @@ enum class SimpleCommand {
             )
         }
     };
+
     protected suspend fun sayFU(args: List<String>, message: Message) {
         message.reply {
             content = "Fuck off, ${message.author?.username ?: "dude"}"
@@ -85,5 +86,6 @@ enum class SimpleCommand {
         ${stats[2].toBeautifulString()}
     """.trimIndent()
     }
+
     abstract suspend fun exec(args: List<String>, message: Message)
 }

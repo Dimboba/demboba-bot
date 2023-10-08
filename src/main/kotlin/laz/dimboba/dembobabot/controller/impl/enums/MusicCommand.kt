@@ -10,7 +10,7 @@ enum class MusicCommand {
         override suspend fun exec(trackScheduler: TrackScheduler, args: List<String>, message: Message) {
             val member = message.getAuthorAsMemberOrNull()
             var searchString = ""
-            for(i in 1..<args.size) {
+            for (i in 1..<args.size) {
                 searchString += "${args[i]} "
             }
             trackScheduler.play(

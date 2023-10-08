@@ -5,13 +5,10 @@ import dev.kord.core.event.message.MessageCreateEvent
 import laz.dimboba.dembobabot.channel.ChannelHandler
 import laz.dimboba.dembobabot.controller.MessageEventHandler
 import laz.dimboba.dembobabot.controller.impl.enums.ChannelCommand
-import laz.dimboba.dembobabot.controller.impl.enums.SimpleCommand
-import laz.dimboba.dembobabot.exceptions.NotACommandMessageException
 import org.koin.core.annotation.Named
 import org.koin.core.annotation.Singleton
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.lang.IllegalArgumentException
 import java.util.*
 
 @Singleton

@@ -4,9 +4,7 @@ import dev.kord.core.entity.Message
 import dev.kord.core.entity.channel.MessageChannel
 import dev.kord.core.event.message.MessageCreateEvent
 import laz.dimboba.dembobabot.controller.MessageEventHandler
-import laz.dimboba.dembobabot.controller.impl.enums.ChannelCommand
 import laz.dimboba.dembobabot.controller.impl.enums.MusicCommand
-import laz.dimboba.dembobabot.controller.impl.enums.SimpleCommand
 import laz.dimboba.dembobabot.exceptions.CannotFindMemberException
 import laz.dimboba.dembobabot.exceptions.NotACommandMessageException
 import laz.dimboba.dembobabot.exceptions.UnknownCommandException
@@ -17,7 +15,6 @@ import org.koin.core.annotation.Singleton
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
-import java.lang.IllegalArgumentException
 import java.util.*
 
 @Singleton
@@ -40,7 +37,7 @@ class MusicMessageEventHandler : MessageEventHandler, KoinComponent {
         } catch (_: IllegalArgumentException) {
             return false
         }
-        if(messageEvent.message.channel != musicMessageChannel) {
+        if (messageEvent.message.channel != musicMessageChannel) {
             throw UnknownCommandException("Music should be played in other channel")
         }
         val voiceChannel = messageEvent
@@ -51,7 +48,8 @@ class MusicMessageEventHandler : MessageEventHandler, KoinComponent {
         //println(voiceChannel)
         //println(trackScheduler.voiceGuild)
         if (trackScheduler.voiceGuild != null &&
-            voiceChannel.id != trackScheduler.voiceGuild?.id) {
+            voiceChannel.id != trackScheduler.voiceGuild?.id
+        ) {
             throw NotACommandMessageException("You must be in voice channel to do that")
         }
         return true

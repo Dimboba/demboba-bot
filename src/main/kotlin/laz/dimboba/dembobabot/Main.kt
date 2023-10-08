@@ -6,25 +6,12 @@ import dev.kord.core.on
 import dev.kord.gateway.Intent
 import dev.kord.gateway.PrivilegedIntent
 import io.github.oshai.kotlinlogging.KotlinLogging
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
-import laz.dimboba.dembobabot.channel.ChannelHandler
 import laz.dimboba.dembobabot.controller.MessageHandler
-import laz.dimboba.dembobabot.controller.impl.ChannelMessageEventHandler
-import laz.dimboba.dembobabot.controller.impl.MusicMessageEventHandler
-import laz.dimboba.dembobabot.controller.impl.SimpleMessageEventHandler
 import laz.dimboba.dembobabot.exceptions.UnknownCommandException
-import laz.dimboba.dembobabot.voice.TrackScheduler
-import laz.dimboba.dembobabot.voice.VoiceConnectionsHandler
-import org.koin.core.annotation.Named
-import org.koin.core.annotation.Singleton
 import org.koin.core.context.startKoin
 import org.koin.core.logger.Level
-import org.koin.core.qualifier.named
-import org.koin.dsl.module
 import org.koin.java.KoinJavaComponent.getKoin
-import org.koin.java.KoinJavaComponent.inject
-import org.koin.ksp.generated.*
+import org.koin.ksp.generated.module
 
 var kord: Kord? = null
 
@@ -50,6 +37,7 @@ suspend fun main(args: Array<String>) {
 
     //TODO: better search for serverGuild
     //TODO: create config for musicTextChannelId
+    //TODO: create MessageQueue with coroutine start of working with messages
     val messageHandler = getKoin().get<MessageHandler>()
     kord!!.on<MessageCreateEvent> {
 

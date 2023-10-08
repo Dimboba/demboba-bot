@@ -14,9 +14,6 @@ import dev.kord.core.entity.Guild
 import dev.kord.core.entity.Message
 import dev.kord.voice.AudioFrame
 import io.github.oshai.kotlinlogging.KotlinLogging
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.runBlocking
 import org.koin.core.annotation.Singleton
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -28,8 +25,7 @@ import kotlin.coroutines.suspendCoroutine
 private val logger = KotlinLogging.logger { }
 
 @Singleton
-class TrackScheduler (
-) : AudioEventListener, KoinComponent {
+class TrackScheduler : AudioEventListener, KoinComponent {
 
 
     private val voiceConnectionsHandler: VoiceConnectionsHandler by inject()
@@ -67,6 +63,7 @@ class TrackScheduler (
     fun getQueue(): ArrayList<AudioTrack> {
         return ArrayList(audioTrackQueue)
     }
+
     fun repeat(message: Message) {
         val answer: String
         if (repeat != null) {
@@ -80,21 +77,21 @@ class TrackScheduler (
                 answer = "Repeating track: ${player.playingTrack.info.title}"
             }
         }
-}
+    }
 
     fun nextSong() {
         val track = player.playingTrack
         player.stopTrack()
-        listeners.forEach {
-            listener -> listener.onTrackSkip(track)
+        listeners.forEach { listener ->
+            listener.onTrackSkip(track)
         }
     }
 
     fun emptyQueue() {
         val queue = ArrayList(audioTrackQueue)
         audioTrackQueue.clear()
-        listeners.forEach {
-            listener -> listener.onClearingQueue(queue)
+        listeners.forEach { listener ->
+            listener.onClearingQueue(queue)
         }
     }
 
@@ -106,8 +103,8 @@ class TrackScheduler (
     suspend fun leave() {
         voiceGuild?.id?.let { voiceConnectionsHandler.closeConnections(it) }
         audioTrackQueue.clear()
-        listeners.forEach {
-            listener -> listener.onLeave()
+        listeners.forEach { listener ->
+            listener.onLeave()
         }
         voiceGuild = null
     }
@@ -243,8 +240,8 @@ class TrackScheduler (
             this.loadItem(query, object : AudioLoadResultHandler {
                 override fun trackLoaded(track: AudioTrack) {
                     queue(track)
-                    listeners.forEach {
-                        listener -> listener.onAddTrack(track)
+                    listeners.forEach { listener ->
+                        listener.onAddTrack(track)
                     }
                     it.resume(true)
                 }
@@ -252,30 +249,30 @@ class TrackScheduler (
                 override fun playlistLoaded(playlist: AudioPlaylist) {
                     if (isSearch) {
                         queue(playlist.tracks.first())
-                        listeners.forEach {
-                            listener -> listener.onAddTrack(playlist.tracks.first())
+                        listeners.forEach { listener ->
+                            listener.onAddTrack(playlist.tracks.first())
                         }
                         it.resume(true)
                         return
                     }
                     queueList(playlist)
-                    listeners.forEach {
-                        listener -> listener.onAddPlaylist(playlist)
+                    listeners.forEach { listener ->
+                        listener.onAddPlaylist(playlist)
                     }
                     it.resume(true)
                 }
 
                 override fun noMatches() {
-                    listeners.forEach {
-                        listener -> listener.onNoMatches()
+                    listeners.forEach { listener ->
+                        listener.onNoMatches()
                     }
                     it.resume(true)
                 }
 
                 override fun loadFailed(exception: FriendlyException?) {
                     logger.error(exception) { "Failed to load, query: $query" }
-                    listeners.forEach {
-                        listener -> listener.onLoadFailed()
+                    listeners.forEach { listener ->
+                        listener.onLoadFailed()
                     }
                     it.resume(true)
                 }
