@@ -8,14 +8,16 @@ import dev.kord.core.entity.channel.MessageChannel
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import org.koin.core.annotation.Singleton
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import org.koin.core.qualifier.named
 
 private val logger = KotlinLogging.logger { }
 
 @Singleton
-class PlayerEventListener (
-    private val messageChannel: MessageChannel
-) : TrackSchedulerListener {
+class PlayerEventListener : TrackSchedulerListener, KoinComponent {
 
+    private val messageChannel: MessageChannel by inject(named("MusicTextChannel"))
     init {
         logger.info {
             "PlayerEventListener is started with channel: ${messageChannel.data.name.value}"

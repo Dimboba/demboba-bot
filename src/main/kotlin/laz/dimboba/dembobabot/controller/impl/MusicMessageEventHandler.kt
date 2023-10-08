@@ -26,9 +26,9 @@ class MusicMessageEventHandler : MessageEventHandler, KoinComponent {
 
     private val trackScheduler: TrackScheduler by inject()
     private val musicMessageChannel: MessageChannel by inject(named("MusicTextChannel"))
+    private val playerEventListener: PlayerEventListener by inject()
 
     init {
-        val playerEventListener = PlayerEventListener(musicMessageChannel)
         trackScheduler.addListener(playerEventListener)
     }
 
