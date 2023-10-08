@@ -17,6 +17,7 @@ import java.util.*
 
 private val logger = KotlinLogging.logger { }
 
+//TODO: Exception if Category does not exist
 @Singleton
 class ChannelHandler : KoinComponent{
 
@@ -84,6 +85,16 @@ class ChannelHandler : KoinComponent{
                     && channel.data.parentId?.value == parentGuild?.id
         }
         channel?.delete()
+    }
+
+    suspend fun deleteCategoryIfExist (name:String) {
+        val category = findCategoryByName(name) ?: return
+        if (serverGuild.channels.firstOrNull {channel ->
+            channel.data.parentId?.value == category.id
+            } != null) {
+            return
+        }
+        category.delete()
     }
 
     suspend fun getTextMessageChannelInstance(

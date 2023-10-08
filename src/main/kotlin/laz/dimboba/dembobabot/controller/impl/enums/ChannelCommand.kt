@@ -33,7 +33,7 @@ enum class ChannelCommand {
 
     DELETE_CATEGORY {
         override suspend fun exec(channelHandler: ChannelHandler, args: List<String>) {
-            TODO("Not yet implemented")
+            channelHandler.deleteCategoryIfExist(args[1])
         }
     };
 
