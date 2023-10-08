@@ -14,6 +14,7 @@ import dev.kord.core.entity.Guild
 import dev.kord.core.entity.Message
 import dev.kord.voice.AudioFrame
 import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.coroutines.runBlocking
 import org.koin.core.annotation.Singleton
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -176,12 +177,9 @@ class TrackScheduler : AudioEventListener, KoinComponent {
 //        }
 
         if (audioTrackQueue.isEmpty()) {
-//            runBlocking {
-//                voiceGuild?.id?.let { voiceConnectionsHandler.closeConnections(it) }
-//                messageChannel?.createMessage(
-//                    "Queue is empty"
-//                )
-//            }
+            runBlocking {
+                leave()
+            }
             return
         }
         player.playTrack(audioTrackQueue.removeFirst())
