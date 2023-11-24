@@ -12,11 +12,19 @@ import org.koin.core.context.startKoin
 import org.koin.core.logger.Level
 import org.koin.java.KoinJavaComponent.getKoin
 import org.koin.ksp.generated.module
+import org.ktorm.database.Database
 
 var kord: Kord? = null
 
 private val logger = KotlinLogging.logger { }
 suspend fun main(args: Array<String>) {
+    val dbPort = "localhost:5432"
+    val database = Database.connect(
+        url = "jdbc:postgresql://localhost:5432/dembobabot",
+        user = "postgres",
+        password = "qwe",
+        driver = "org.postgresql.Driver"
+    )
 
     val token: String = System.getenv("discord_token") ?: "null-token"
 
