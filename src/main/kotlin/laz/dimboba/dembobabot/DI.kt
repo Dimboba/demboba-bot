@@ -11,7 +11,13 @@ import org.koin.core.annotation.Singleton
 
 @Module
 @ComponentScan("laz.dimboba.dembobabot.voice")
-class VoiceModel
+class VoiceModel {
+
+    @Singleton
+    fun lavaKord() = runBlocking {
+        kord!!.lavakord()
+    }
+}
 
 @Module
 @ComponentScan("laz.dimboba.dembobabot.overwatch")
@@ -37,11 +43,5 @@ class MainModel {
     @Named("ServerGuild")
     fun serverGuild() = runBlocking {
         kord!!.guilds.first()
-    }
-
-    @Singleton
-    @Named("LavaLink")
-    fun lavaLink() = runBlocking {
-        kord!!.lavakord()
     }
 }

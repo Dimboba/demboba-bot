@@ -25,6 +25,7 @@ import mu.KotlinLogging
 import org.koin.core.annotation.Singleton
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.koin.core.qualifier.named
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -37,7 +38,7 @@ class TrackScheduler : AudioEventListener, KoinComponent {
 
 
     private val voiceConnectionsHandler: VoiceConnectionsHandler by inject()
-    private val lavakord = kord!!.lavakord()
+    private val lavakord: LavaKord by inject()
     private val lavaplayerManager = DefaultAudioPlayerManager()
     private val audioTrackQueue = ArrayList<AudioTrack>()
     private val player = lavaplayerManager.createPlayer()
@@ -47,7 +48,7 @@ class TrackScheduler : AudioEventListener, KoinComponent {
         private set
 
     init {
-//        lavakord.addNode("ws://localhost:8080", "youshallnotpass")
+        lavakord.addNode("ws://localhost:2333", "youshallnotpass")
         //lavaplayerManager.registerSourceManager(YoutubeAudioSourceManager())
         AudioSourceManagers.registerRemoteSources(lavaplayerManager)
         player.addListener(this)
