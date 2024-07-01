@@ -8,13 +8,20 @@ import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack
+import dev.arbjerg.lavalink.protocol.v4.LoadResult
 import dev.kord.common.annotation.KordVoice
 import dev.kord.core.behavior.channel.BaseVoiceChannelBehavior
 import dev.kord.core.entity.Guild
 import dev.kord.core.entity.Message
 import dev.kord.voice.AudioFrame
-import io.github.oshai.kotlinlogging.KotlinLogging
+import dev.schlaubi.lavakord.LavaKord
+import dev.schlaubi.lavakord.kord.getLink
 import kotlinx.coroutines.runBlocking
+import laz.dimboba.dembobabot.kord
+import dev.schlaubi.lavakord.kord.lavakord
+import dev.schlaubi.lavakord.rest.loadItem
+import kotlinx.serialization.json.JsonNull.content
+import mu.KotlinLogging
 import org.koin.core.annotation.Singleton
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -30,7 +37,7 @@ class TrackScheduler : AudioEventListener, KoinComponent {
 
 
     private val voiceConnectionsHandler: VoiceConnectionsHandler by inject()
-
+    private val lavakord = kord!!.lavakord()
     private val lavaplayerManager = DefaultAudioPlayerManager()
     private val audioTrackQueue = ArrayList<AudioTrack>()
     private val player = lavaplayerManager.createPlayer()
@@ -40,6 +47,7 @@ class TrackScheduler : AudioEventListener, KoinComponent {
         private set
 
     init {
+//        lavakord.addNode("ws://localhost:8080", "youshallnotpass")
         //lavaplayerManager.registerSourceManager(YoutubeAudioSourceManager())
         AudioSourceManagers.registerRemoteSources(lavaplayerManager)
         player.addListener(this)
@@ -228,7 +236,6 @@ class TrackScheduler : AudioEventListener, KoinComponent {
         )
     }
 
-
     private suspend fun DefaultAudioPlayerManager.loadTrack(
         query: String,
         isSearch: Boolean = false
@@ -275,6 +282,25 @@ class TrackScheduler : AudioEventListener, KoinComponent {
                     it.resume(true)
                 }
             })
+        }
+    }
+
+
+    public suspend fun playLink(
+        messageGuild: Guild,
+        channel: BaseVoiceChannelBehavior,
+        searchString: String
+    ) {
+        val link = lavakord.getLink(messageGuild.id)
+        val player = link.player
+        link.connectAudio(channel.id.value)
+
+        when (val item = link.loadItem("ytsearch:$searchString")) {
+            is LoadResult.TrackLoaded -> player.playTrack(track = item.data)
+            is LoadResult.PlaylistLoaded -> player.playTrack(track = item.data.tracks.first())
+            is LoadResult.SearchResult -> player.playTrack(item.data.tracks.first())
+            is LoadResult.NoMatches -> logger.error { "No match found for $searchString" }
+            is LoadResult.LoadFailed -> logger.error { "Load failed for $searchString" }
         }
     }
 }

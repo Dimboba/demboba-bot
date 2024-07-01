@@ -1,5 +1,6 @@
 package laz.dimboba.dembobabot
 
+import dev.schlaubi.lavakord.kord.lavakord
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import laz.dimboba.dembobabot.channel.ChannelHandler
@@ -36,5 +37,11 @@ class MainModel {
     @Named("ServerGuild")
     fun serverGuild() = runBlocking {
         kord!!.guilds.first()
+    }
+
+    @Singleton
+    @Named("LavaLink")
+    fun lavaLink() = runBlocking {
+        kord!!.lavakord()
     }
 }

@@ -5,13 +5,25 @@ import dev.kord.core.event.message.MessageCreateEvent
 import dev.kord.core.on
 import dev.kord.gateway.Intent
 import dev.kord.gateway.PrivilegedIntent
-import io.github.oshai.kotlinlogging.KotlinLogging
 import laz.dimboba.dembobabot.controller.MessageHandler
 import laz.dimboba.dembobabot.exceptions.UnknownCommandException
+import mu.KotlinLogging
 import org.koin.core.context.startKoin
 import org.koin.core.logger.Level
 import org.koin.java.KoinJavaComponent.getKoin
 import org.koin.ksp.generated.module
+
+/*
+kord.createGlobalApplicationCommands {
+        input("connect", "Connects to your channel")
+        input("pause", "Pauses the player")
+        input("stop", "Stops the player")
+        input("leave", "Leaves the channel")
+        input("play", "Starts playing a track") {
+            string("query", "The query you want to play")
+        }
+    }
+ */
 
 var kord: Kord? = null
 
@@ -23,7 +35,7 @@ suspend fun main(args: Array<String>) {
     kord = Kord(token)
 
     startKoin {
-        printLogger(Level.INFO)
+        printLogger(Level.ERROR)
 
         modules(
             VoiceModel().module,

@@ -11,6 +11,7 @@ import org.koin.core.annotation.Singleton
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
+import kotlin.math.log
 
 private val logger = KotlinLogging.logger { }
 
@@ -34,6 +35,7 @@ class PlayerEventListener : TrackSchedulerListener, KoinComponent {
             messageChannel.createMessage(
                 content = "Track ${skippedTrack.info.title} was skipped"
             )
+
         }
     }
 
@@ -46,6 +48,7 @@ class PlayerEventListener : TrackSchedulerListener, KoinComponent {
     }
 
     override fun onLeave() {
+        logger.info { "PlayerEventListener is stopped" }
         runBlocking {
             messageChannel.createMessage(
                 content = "Music player is shutdown"
@@ -54,6 +57,7 @@ class PlayerEventListener : TrackSchedulerListener, KoinComponent {
     }
 
     override fun onAddTrack(track: AudioTrack) {
+        logger.info { "Added track ${track.info.title}" }
         runBlocking {
             messageChannel.createMessage(
                 content = "Add track: ${track.info.title}"
@@ -62,6 +66,7 @@ class PlayerEventListener : TrackSchedulerListener, KoinComponent {
     }
 
     override fun onAddPlaylist(playlist: AudioPlaylist) {
+        logger.info { playlist.name }
         runBlocking {
             messageChannel.createMessage(
                 content = "Add ${playlist.tracks.size} tracks from ${playlist.name}"

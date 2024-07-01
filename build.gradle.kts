@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "laz.dimboba"
-version = "1.0-SNAPSHOT"
+version = "1.1-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -19,6 +19,7 @@ repositories {
     maven("https://oss.sonatype.org/content/repositories/snapshots")
     // Lavaplayer Repository
     maven("https://m2.dv8tion.net/releases")
+    maven("https://jitpack.io")
 }
 
 dependencies {
@@ -30,7 +31,16 @@ dependencies {
     implementation("dev.kord:kord-voice:0.10.0")
     implementation("dev.kord:kord-core-voice:0.10.0")
     // Lavaplayer
-    implementation("com.sedmelluq:lavaplayer:1.3.77")
+    implementation("dev.arbjerg:lavaplayer:2.2.0")
+    // Lavalink
+//    implementation("dev.schlaubi.lavakord:core-jvm:7.0.3")
+//    implementation("dev.schlaubi.lavakord:jda-jvm:5.1.7")
+//    implementation("dev.schlaubi.lavakord:lavasearch-jvm:7.0.3")
+// https://mvnrepository.com/artifact/dev.schlaubi.lavakord/kord
+    implementation("dev.schlaubi.lavakord:kord:7.0.3")
+
+//    runtimeOnly("dev.arbjerg.lavakord:kord-extensions:7.0.3")
+//    implementation("com.github.kordlib:Lavalink.kt:7.0.2")
     // Logging
     implementation("io.github.oshai:kotlin-logging-jvm:5.1.0")
     implementation("org.slf4j:slf4j-simple:2.0.3")
@@ -50,7 +60,7 @@ tasks.test {
 }
 
 kotlin {
-    jvmToolchain(8)
+    jvmToolchain(17)
 }
 
 tasks.withType(ShadowJar::class.java) {

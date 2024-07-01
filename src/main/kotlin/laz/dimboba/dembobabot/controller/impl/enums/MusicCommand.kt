@@ -13,7 +13,7 @@ enum class MusicCommand {
             for (i in 1..<args.size) {
                 searchString += "${args[i]} "
             }
-            trackScheduler.play(
+            trackScheduler.playLink(
                 message.getGuild(),
                 member?.getVoiceState()?.getChannelOrNull()
                     ?: throw CannotFindMemberException("There is no such member"),
