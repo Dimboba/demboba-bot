@@ -13,7 +13,7 @@ enum class MusicCommand {
             for (i in 1..<args.size) {
                 searchString += "${args[i]} "
             }
-            trackScheduler.playLink(
+            trackScheduler.play(
                 message.getGuild(),
                 member?.getVoiceState()?.getChannelOrNull()
                     ?: throw CannotFindMemberException("There is no such member"),
@@ -41,9 +41,9 @@ enum class MusicCommand {
         override suspend fun exec(trackScheduler: TrackScheduler, args: List<String>, message: Message) {
             runBlocking {
                 message.channel.createMessage(
-                    trackScheduler.getQueue().joinToString { track ->
-                        track.info.title + '\n'
-                    }
+                    trackScheduler.getQueue()
+                        .mapIndexed { index, track -> "${index + 1}) ${track.info.title}" }
+                        .joinToString("\n")
                 )
             }
         }
@@ -52,7 +52,13 @@ enum class MusicCommand {
         override suspend fun exec(trackScheduler: TrackScheduler, args: List<String>, message: Message) {
             trackScheduler.emptyQueue()
         }
-    };
+    },
+    REPEAT {
+        override suspend fun exec(trackScheduler: TrackScheduler, args: List<String>, message: Message) {
+            trackScheduler.repeat()
+        }
+    }
+    ;
 
 
     abstract suspend fun exec(trackScheduler: TrackScheduler, args: List<String>, message: Message)

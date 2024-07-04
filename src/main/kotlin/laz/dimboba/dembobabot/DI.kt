@@ -15,7 +15,11 @@ class VoiceModel {
 
     @Singleton
     fun lavaKord() = runBlocking {
-        kord!!.lavakord()
+        val lavakord = kord!!.lavakord()
+        lavakord.addNode("ws://localhost:2333", "youshallnotpass")
+
+        return@runBlocking lavakord
+
     }
 }
 

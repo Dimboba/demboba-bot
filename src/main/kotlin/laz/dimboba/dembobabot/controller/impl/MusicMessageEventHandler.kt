@@ -8,7 +8,6 @@ import laz.dimboba.dembobabot.controller.impl.enums.MusicCommand
 import laz.dimboba.dembobabot.exceptions.CannotFindMemberException
 import laz.dimboba.dembobabot.exceptions.NotACommandMessageException
 import laz.dimboba.dembobabot.exceptions.UnknownCommandException
-import laz.dimboba.dembobabot.voice.PlayerEventListener
 import laz.dimboba.dembobabot.voice.TrackScheduler
 import org.koin.core.annotation.Named
 import org.koin.core.annotation.Singleton
@@ -23,11 +22,7 @@ class MusicMessageEventHandler : MessageEventHandler, KoinComponent {
 
     private val trackScheduler: TrackScheduler by inject()
     private val musicMessageChannel: MessageChannel by inject(named("MusicTextChannel"))
-    private val playerEventListener: PlayerEventListener by inject()
 
-    init {
-        trackScheduler.addListener(playerEventListener)
-    }
 
     private var currMessage: Message? = null
 
@@ -45,8 +40,6 @@ class MusicMessageEventHandler : MessageEventHandler, KoinComponent {
             .getAuthorAsMemberOrNull()
             ?.getVoiceState()
             ?.getChannelOrNull() ?: throw CannotFindMemberException("There is no such member")
-        //println(voiceChannel)
-        //println(trackScheduler.voiceGuild)
         if (trackScheduler.voiceGuild != null &&
             voiceChannel.id != trackScheduler.voiceGuild?.id
         ) {
