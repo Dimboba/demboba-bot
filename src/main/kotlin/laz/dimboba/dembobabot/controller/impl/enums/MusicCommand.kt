@@ -34,7 +34,7 @@ enum class MusicCommand {
     },
     NEXT {
         override suspend fun exec(trackScheduler: TrackScheduler, args: List<String>, message: Message) {
-            trackScheduler.nextSong()
+                trackScheduler.nextSong()
         }
     },
     QUEUE {

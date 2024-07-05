@@ -35,16 +35,6 @@ class MusicMessageEventHandler : MessageEventHandler, KoinComponent {
         if (messageEvent.message.channel != musicMessageChannel) {
             throw UnknownCommandException("Music should be played in other channel")
         }
-        val voiceChannel = messageEvent
-            .message
-            .getAuthorAsMemberOrNull()
-            ?.getVoiceState()
-            ?.getChannelOrNull() ?: throw CannotFindMemberException("There is no such member")
-        if (trackScheduler.voiceGuild != null &&
-            voiceChannel.id != trackScheduler.voiceGuild?.id
-        ) {
-            throw NotACommandMessageException("You must be in voice channel to do that")
-        }
         return true
     }
 

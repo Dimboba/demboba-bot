@@ -32,16 +32,10 @@ class TrackScheduler : KoinComponent {
     private val serverGuild: Guild by inject(named("ServerGuild"))
     private val audioTrackQueue = ArrayList<Track>()
     private var repeat: AtomicBoolean = AtomicBoolean(false)
-    var voiceGuild: BaseVoiceChannelBehavior? = null
-        private set
     private val link = lavakord.getLink(serverGuild.id)
     private val player = link.player
 
     init {
-        runBlocking {
-            link.connectAudio(messageChannel.id.value)
-        }
-
         player.on<TrackEvent> {
             when(this) {
                 is TrackStartEvent -> {
@@ -130,7 +124,6 @@ class TrackScheduler : KoinComponent {
     }
 
     suspend fun emptyQueue() {
-        val queue = ArrayList(audioTrackQueue)
         audioTrackQueue.clear()
         messageChannel.createMessage("Queue was cleared")
     }
@@ -141,10 +134,10 @@ class TrackScheduler : KoinComponent {
     }
 
     suspend fun leave() {
-//        voiceGuild?.id?.let { voiceConnectionsHandler.closeConnections(it) }
         link.disconnectAudio()
         audioTrackQueue.clear()
-        voiceGuild = null
+        player.stopTrack()
+        messageChannel.createMessage("Bye-bye")
     }
 
     suspend fun play(
@@ -152,6 +145,7 @@ class TrackScheduler : KoinComponent {
         channel: BaseVoiceChannelBehavior,
         searchString: String
     ) {
+        //todo: make it two different functions
         if (searchString.trim().isEmpty() && player.paused) {
             player.pause(false)
             messageChannel.createMessage(
@@ -162,7 +156,7 @@ class TrackScheduler : KoinComponent {
 
         loadYTTrack(searchString)
         if(player.playingTrack == null) {
-            voiceGuild = channel
+            //todo: work with link is player in current channel or not
             val link = lavakord.getLink(messageGuild.id)
             link.connectAudio(channel.id.value)
             player.playTrack(audioTrackQueue.first())
