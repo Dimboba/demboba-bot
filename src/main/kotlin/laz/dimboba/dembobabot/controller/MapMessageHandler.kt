@@ -13,7 +13,6 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.lang.reflect.Method
 import java.lang.reflect.Modifier
-import java.util.*
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.suspendCoroutine
 
@@ -33,16 +32,13 @@ class MapMessageHandler : KoinComponent {
             .enableAllInfo()
             .acceptPackages("laz.dimboba.dembobabot")
             .scan(). use { scanResult ->
-                scanResult.allClasses
-                    .flatMap { classInfo ->
-                        classInfo.loadClass()
-                            .declaredMethods
-                            .filter { it.getAnnotation(annotation) != null}
-                    }
+                scanResult.getClassesWithMethodAnnotation(annotation)
+                    .flatMap { it.loadClass().declaredMethods.toList() }
+                    .filter { it.getAnnotation(annotation) != null}
                     .flatMap {
                         it.getAnnotation(annotation)
                         .commands
-                        .map { command -> command.lowercase() to it }
+                        .map { command -> command.lowercase() to it } // don't know about lowercase
                     }
                     .toMap()
             }
@@ -84,7 +80,7 @@ class MapMessageHandler : KoinComponent {
             .map { type -> argumentsMap[type] }
 
 
-        // if function is suspend it has invisible continuation parameter at end
+        // if function is suspend it has invisible continuation parameter at the end
         if (methodArguments.last() is Continuation<*>?) {
             invokeSuspend(invoker, *(methodArguments.dropLast(1).toTypedArray()))
             return

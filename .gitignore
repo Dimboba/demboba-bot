@@ -41,5 +41,7 @@ bin/
 
 ### Mac OS ###
 .DS_Store
-
 .env
+
+### Lavalink Plugins ###
+/Lavalink/plugins/**
