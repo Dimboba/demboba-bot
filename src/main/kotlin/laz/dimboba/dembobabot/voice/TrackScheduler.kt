@@ -11,7 +11,8 @@ import dev.schlaubi.lavakord.LavaKord
 import dev.schlaubi.lavakord.audio.*
 import dev.schlaubi.lavakord.kord.getLink
 import dev.schlaubi.lavakord.rest.loadItem
-import kotlinx.coroutines.runBlocking
+import laz.dimboba.dembobabot.controller.CommandAction
+import laz.dimboba.dembobabot.exceptions.CannotFindMemberException
 import mu.KotlinLogging
 import org.koin.core.annotation.Singleton
 import org.koin.core.component.KoinComponent
@@ -62,10 +63,6 @@ class TrackScheduler : KoinComponent {
 
     }
 
-
-    // interactions
-    //TODO: fix because track's state = FINISHED
-
     private suspend fun handleTrackEndEvent(event: TrackEndEvent) {
         when (event.reason) {
             Message.EmittedEvent.TrackEndEvent.AudioTrackEndReason.LOAD_FAILED -> {
@@ -102,10 +99,16 @@ class TrackScheduler : KoinComponent {
         player.playTrack(audioTrackQueue.first())
     }
 
-    fun getQueue(): ArrayList<Track> {
-        return ArrayList(audioTrackQueue)
+    @CommandAction("queue")
+    suspend fun getQueue() {
+        messageChannel.createMessage(
+            audioTrackQueue
+                .mapIndexed { index, track -> "${index + 1}) ${track.info.title}" }
+                .joinToString("\n")
+        )
     }
 
+    @CommandAction("repeat", "repeat-mode")
     suspend fun repeat() {
         val answer: String
         if (repeat.compareAndSet(expected = true, new = false)) {
@@ -117,22 +120,26 @@ class TrackScheduler : KoinComponent {
         messageChannel.createMessage(answer)
     }
 
+    @CommandAction("next", "skip")
     suspend fun nextSong() {
         val track = player.playingTrack
         player.stopTrack()
         messageChannel.createMessage("Track ${track?.info?.title ?: "unknown"} was skipped")
     }
 
+    @CommandAction("empty")
     suspend fun emptyQueue() {
         audioTrackQueue.clear()
         messageChannel.createMessage("Queue was cleared")
     }
 
+    @CommandAction("pause", "stop")
     suspend fun pause() {
         player.pause(true)
         messageChannel.createMessage("Player paused")
     }
 
+    @CommandAction("leave")
     suspend fun leave() {
         link.disconnectAudio()
         audioTrackQueue.clear()
@@ -140,7 +147,24 @@ class TrackScheduler : KoinComponent {
         messageChannel.createMessage("Bye-bye")
     }
 
+    @CommandAction("play")
     suspend fun play(
+        message: dev.kord.core.entity.Message,
+        args: List<String>
+    ) {
+        var searchString = ""
+        for (i in 1..<args.size) {
+            searchString += "${args[i]} "
+        }
+        play(
+            message.getGuild(),
+            message.getAuthorAsMemberOrNull()?.getVoiceState()?.getChannelOrNull()
+                ?: throw CannotFindMemberException("There is no such member"),
+            searchString
+        )
+    }
+
+    suspend private fun play(
         messageGuild: Guild,
         channel: BaseVoiceChannelBehavior,
         searchString: String
@@ -163,7 +187,7 @@ class TrackScheduler : KoinComponent {
         }
     }
 
-    private  fun loadYTSong(searchString: String): String {
+    private fun createYTSearchString(searchString: String): String {
         val search = searchString.trimStart()
         val query: String = if (search.startsWith("https://www.youtube.com")
             || search.startsWith("https://youtu.be")
@@ -185,7 +209,7 @@ class TrackScheduler : KoinComponent {
     private suspend fun loadYTTrack(
         searchString: String
     ) {
-        when (val item = link.loadItem(loadYTSong(searchString))) {
+        when (val item = link.loadItem(createYTSearchString(searchString))) {
             is LoadResult.TrackLoaded -> {
                 messageChannel.createMessage("Added track ${item.data.info.title} to queue")
                 audioTrackQueue.add(item.data)

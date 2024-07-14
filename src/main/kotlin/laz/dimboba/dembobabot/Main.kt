@@ -5,7 +5,8 @@ import dev.kord.core.event.message.MessageCreateEvent
 import dev.kord.core.on
 import dev.kord.gateway.Intent
 import dev.kord.gateway.PrivilegedIntent
-import laz.dimboba.dembobabot.controller.MessageHandler
+import laz.dimboba.dembobabot.controller.CommandAction
+import laz.dimboba.dembobabot.controller.MapMessageHandler
 import laz.dimboba.dembobabot.exceptions.UnknownCommandException
 import mu.KotlinLogging
 import org.koin.core.context.startKoin
@@ -47,25 +48,24 @@ suspend fun main(args: Array<String>) {
 
     }
 
+    val mapMessageHandler = getKoin().get<MapMessageHandler>()
+
     //TODO: better search for serverGuild
     //TODO: create config for musicTextChannelId
     //TODO: create MessageQueue with coroutine start of working with messages
-    val messageHandler = getKoin().get<MessageHandler>()
     kord!!.on<MessageCreateEvent> {
-
         // ignore other bots, even ourselves. We only serve humans here!
         if (message.author?.isBot != false) return@on
         try {
-            messageHandler.handleMessage(this)
+            mapMessageHandler.handle(this)
+//            messageHandler.handleMessage(this)
         } catch (ex: UnknownCommandException) {
             message.channel.createMessage(
                 "В Политехе такому не учили :<"
             )
             return@on
         } catch (ex: Exception) {
-            logger.error {
-                ex.message
-            }
+            logger.error(ex) { ex.message }
             return@on
         }
 
@@ -82,5 +82,15 @@ suspend fun main(args: Array<String>) {
         @OptIn(PrivilegedIntent::class)
         intents += Intent.GuildVoiceStates
     }
+}
+
+@CommandAction("hui", "pidor")
+fun hui() {
+    print("HUI")
+}
+
+@CommandAction()
+fun bitch() {
+    print("bitch")
 }
 

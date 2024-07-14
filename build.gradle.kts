@@ -40,6 +40,8 @@ dependencies {
     implementation("io.insert-koin:koin-annotations:1.3.0")
     ksp("io.insert-koin:koin-ksp-compiler:1.3.0")
 
+    implementation(kotlin("reflect"))
+    implementation("io.github.classgraph:classgraph:4.8.165")
 }
 
 application {

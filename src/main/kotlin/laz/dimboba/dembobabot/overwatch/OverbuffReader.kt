@@ -19,8 +19,6 @@ class OverbuffReader {
 
     fun getPlayerStats(battleTag: String, gameMode: String = "All"): OverwatchPlayerStats {
 
-        //println(battleTag + "  " + gameMode)
-
         checkBattleTag(battleTag)
 
         var postfixUrl: String = ""
@@ -31,11 +29,8 @@ class OverbuffReader {
         val userAddress = battleTag.replace('#', '-')
 
         val jsoupConnection = Jsoup.connect(address + userAddress + postfixUrl)
-        //println(address + userAddress + postfixUrl)
         val document = jsoupConnection.get()
         try {
-
-            //val body = document.body()
 
             val sideBar = document.select(".sidebar-column")[0]
 
