@@ -3,11 +3,12 @@ package laz.dimboba.dembobabot.controller
 import dev.kord.core.entity.Message
 import dev.kord.core.event.message.MessageCreateEvent
 import io.github.classgraph.ClassGraph
-import laz.dimboba.dembobabot.channel.ChannelController
+import io.github.oshai.kotlinlogging.KotlinLogging
 import laz.dimboba.dembobabot.exceptions.NotACommandMessageException
+import laz.dimboba.dembobabot.exceptions.UnknownClassForCommandException
 import laz.dimboba.dembobabot.exceptions.UnknownCommandException
 import laz.dimboba.dembobabot.voice.TrackScheduler
-import mu.KotlinLogging
+import laz.dimboba.dembobabot.voice.TrackSchedulerProvider
 import org.koin.core.annotation.Singleton
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -20,10 +21,8 @@ private val logger = KotlinLogging.logger { }
 @Singleton
 class MapMessageHandler : KoinComponent {
 
-    //todo: collect to map through annotation
     private val commandMap: Map<String, Method>
-    private val trackScheduler: TrackScheduler by inject()
-    private val channelController: ChannelController by inject()
+    private val schedulerProvider: TrackSchedulerProvider by inject()
 
     private fun collectCommands(): Map<String, Method> {
         val annotation = CommandAction::class.java
@@ -45,8 +44,8 @@ class MapMessageHandler : KoinComponent {
     }
 
     init {
-        logger.info("MapMessageHandler is started")
         commandMap = collectCommands()
+        logger.info { "MapMessageHandler with ${commandMap.size} commands is started" }
     }
 
     private var commandChar = '!'
@@ -60,12 +59,19 @@ class MapMessageHandler : KoinComponent {
 
         if(Modifier.isStatic(method.modifiers)) {
             method.invokeCommand(null, messageCreateEvent, args)
+            return
         }
         //todo : add several servers handling
         // now it is easy to determine scheduler/handler by server id
         when(method.declaringClass) {
-            TrackScheduler::class.java -> method.invokeCommand(trackScheduler, messageCreateEvent, args)
-            ChannelController::class.java -> method.invokeCommand(channelController, messageCreateEvent, args)
+            TrackScheduler::class.java -> method.invokeCommand(
+                schedulerProvider.getScheduler(messageCreateEvent),
+                messageCreateEvent,
+                args
+            )
+            else -> throw UnknownClassForCommandException(
+                "There is no handler for class ${method.declaringClass.canonicalName} " +
+                "required for command ${args[0]}")
         }
     }
 
@@ -96,7 +102,7 @@ class MapMessageHandler : KoinComponent {
     private fun parseCommand(messageContent: String): List<String> {
         val content = messageContent.split(" ").toMutableList()
         if (content.isEmpty())
-            throw NotACommandMessageException("Message: there is no commands")
+            throw NotACommandMessageException("There is no commands")
 
         content[0] = content[0].lowercase()
 

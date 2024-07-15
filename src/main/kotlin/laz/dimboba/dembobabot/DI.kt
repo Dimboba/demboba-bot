@@ -1,23 +1,20 @@
 package laz.dimboba.dembobabot
 
+import dev.kord.core.Kord
 import dev.schlaubi.lavakord.kord.lavakord
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
-import laz.dimboba.dembobabot.channel.ChannelHandler
 import org.koin.core.annotation.ComponentScan
 import org.koin.core.annotation.Module
-import org.koin.core.annotation.Named
 import org.koin.core.annotation.Singleton
 
 @Module
 @ComponentScan("laz.dimboba.dembobabot.voice")
-class VoiceModel {
+class VoiceModule {
 
-    @Singleton
-    fun lavaKord() = runBlocking {
-        val lavakord = kord!!.lavakord()
+    @Singleton(createdAtStart = true)
+    fun lavaKord(kord: Kord) = runBlocking {
+        val lavakord = kord.lavakord()
         lavakord.addNode("ws://localhost:2333", "youshallnotpass")
-
         return@runBlocking lavakord
 
     }
@@ -25,27 +22,21 @@ class VoiceModel {
 
 @Module
 @ComponentScan("laz.dimboba.dembobabot.overwatch")
-class OverwatchModel
+class OverwatchModule
 
 @Module
 @ComponentScan("laz.dimboba.dembobabot.controller")
-class ControllerModel
+class ControllerModule
 
 @Module
 @ComponentScan("laz.dimboba.dembobabot.channel")
-class ChannelModel {
-    @Singleton
-    @Named("MusicTextChannel")
-    fun musicTextChannel(channelHandler: ChannelHandler) = runBlocking {
-        channelHandler.getTextMessageChannelInstance("demboba-dj")
-    }
-}
+class ChannelModule
 
 @Module
-class MainModel {
+class MainModule {
     @Singleton
-    @Named("ServerGuild")
-    fun serverGuild() = runBlocking {
-        kord!!.guilds.first()
+    fun kord(): Kord = runBlocking {
+        val token: String = System.getenv("discord_token") ?: "null-token"
+        return@runBlocking Kord(token)
     }
 }

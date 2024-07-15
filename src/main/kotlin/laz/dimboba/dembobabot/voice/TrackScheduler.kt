@@ -11,26 +11,22 @@ import dev.schlaubi.lavakord.LavaKord
 import dev.schlaubi.lavakord.audio.*
 import dev.schlaubi.lavakord.kord.getLink
 import dev.schlaubi.lavakord.rest.loadItem
+import io.github.oshai.kotlinlogging.KotlinLogging
 import laz.dimboba.dembobabot.controller.CommandAction
 import laz.dimboba.dembobabot.exceptions.CannotFindMemberException
-import mu.KotlinLogging
-import org.koin.core.annotation.Singleton
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import org.koin.core.qualifier.named
 
-//TODO: false message about empty queue after leave
 //TODO: end refactoring (all messages to a new class)
 //todo: maybe change skip and repeat mode work together
 private val logger = KotlinLogging.logger { }
 
-@Singleton
-class TrackScheduler : KoinComponent {
-
+class TrackScheduler(
+    private val messageChannel: MessageChannel,
+    serverGuild: Guild
+) : KoinComponent {
 
     private val lavakord: LavaKord by inject()
-    private val messageChannel: MessageChannel by inject(named("MusicTextChannel"))
-    private val serverGuild: Guild by inject(named("ServerGuild"))
     private val audioTrackQueue = ArrayList<Track>()
     private var repeat: AtomicBoolean = AtomicBoolean(false)
     private val link = lavakord.getLink(serverGuild.id)
@@ -58,7 +54,7 @@ class TrackScheduler : KoinComponent {
         }
 
         logger.info {
-            "TrackScheduler is started"
+            "TrackScheduler for server ${serverGuild.name} with id ${serverGuild.id} has started"
         }
 
     }
