@@ -1,5 +1,6 @@
 package laz.dimboba.dembobabot.help
 
+import dev.kord.core.behavior.channel.createMessage
 import dev.kord.core.behavior.reply
 import dev.kord.core.event.message.MessageCreateEvent
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -13,6 +14,7 @@ import java.util.*
 
 private val logger = KotlinLogging.logger {}
 
+//todo: make more fancy and beautiful
 @Singleton
 class HelpController: KoinComponent {
 
@@ -60,22 +62,30 @@ class HelpController: KoinComponent {
     }
 
     private fun getCommandList(): String {
-        return methodNameToCommands.map { (methodName, commands) ->
-            val description = descriptions.getProperty("command.description.$methodName") ?: ""
-            val commandString = commands.joinToString(separator = ", ")
-            return@map "$commandString - $description"
-        }.joinToString("\n")
+        val endLine = "\n"
+        val tab = "    "
+        return methodNameToCommands
+            .map { (methodName, commands) ->
+                val description = descriptions.getProperty(methodName)
+                if (description != null) {
+                    val commandsString = commands.map { "- $it" }.joinToString(separator = "$tab$endLine")
+                    return@map "**$description**$endLine$commandsString"
+                }
+                return@map null
+            }
+            .filterNotNull()
+            .joinToString("\n")
     }
 
     private fun getHelpReplyMessage(args: List<String>): String {
         if(args.size < 2 || args[1] == "") {
-            return descriptions.getProperty("command.description.help")
+            return usages.getProperty("help")
         }
         val command = commandToMethodName[args[1]]
-            ?: return "Command does not exist\n${descriptions.getProperty("command.description.help")}"
+            ?: return "Command does not exist\n${usages.getProperty("help")}"
 
-        val description = descriptions.getProperty("command.description.${command}")
-        val usage = usages.getProperty("command.usage.${command}") ?: ""
+        val description = descriptions.getProperty(command)
+        val usage = usages.getProperty(command) ?: ""
 
         return "${description}\n${usage}"
     }
