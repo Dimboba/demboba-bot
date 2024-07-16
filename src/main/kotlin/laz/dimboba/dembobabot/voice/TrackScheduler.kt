@@ -83,20 +83,22 @@ class TrackScheduler(
 
     private suspend fun playNextTrack(track: Track) {
         if(repeat.value) {
-            player.playTrack(audioTrackQueue.first())
+            player.playTrack(track)
             return
         }
-        audioTrackQueue.removeFirst()
         if(audioTrackQueue.size == 0) {
             messageChannel.createMessage("The queue is empty. Bye-bye!")
             link.disconnectAudio()
             return
         }
-        player.playTrack(audioTrackQueue.first())
+        player.playTrack(audioTrackQueue.removeFirst())
     }
 
-    @CommandAction("queue")
+    @CommandAction("queue", ["queue"])
     suspend fun getQueue() {
+        if (audioTrackQueue.isEmpty()) {
+            messageChannel.createMessage("Queue is empty")
+        }
         messageChannel.createMessage(
             audioTrackQueue
                 .mapIndexed { index, track -> "${index + 1}) ${track.info.title}" }
@@ -104,7 +106,7 @@ class TrackScheduler(
         )
     }
 
-    @CommandAction("repeat", "repeat-mode")
+    @CommandAction("repeat", ["repeat", "repeat-mode"])
     suspend fun repeat() {
         val answer: String
         if (repeat.compareAndSet(expected = true, new = false)) {
@@ -116,26 +118,26 @@ class TrackScheduler(
         messageChannel.createMessage(answer)
     }
 
-    @CommandAction("next", "skip")
+    @CommandAction("skip", ["next", "skip"])
     suspend fun nextSong() {
         val track = player.playingTrack
         player.stopTrack()
         messageChannel.createMessage("Track ${track?.info?.title ?: "unknown"} was skipped")
     }
 
-    @CommandAction("empty")
+    @CommandAction("empty", ["empty"])
     suspend fun emptyQueue() {
         audioTrackQueue.clear()
         messageChannel.createMessage("Queue was cleared")
     }
 
-    @CommandAction("pause", "stop")
+    @CommandAction("pause", ["pause", "stop"])
     suspend fun pause() {
         player.pause(true)
         messageChannel.createMessage("Player paused")
     }
 
-    @CommandAction("leave")
+    @CommandAction("leave", ["leave"])
     suspend fun leave() {
         link.disconnectAudio()
         audioTrackQueue.clear()
@@ -143,7 +145,7 @@ class TrackScheduler(
         messageChannel.createMessage("Bye-bye")
     }
 
-    @CommandAction("play")
+    @CommandAction("play", ["play"])
     suspend fun play(
         message: dev.kord.core.entity.Message,
         args: List<String>
@@ -179,7 +181,7 @@ class TrackScheduler(
             //todo: work with link is player in current channel or not
             val link = lavakord.getLink(messageGuild.id)
             link.connectAudio(channel.id.value)
-            player.playTrack(audioTrackQueue.first())
+            player.playTrack(audioTrackQueue.removeFirst())
         }
     }
 

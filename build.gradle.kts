@@ -28,8 +28,6 @@ dependencies {
     implementation("org.jsoup:jsoup:1.15.3")
     // Kord
     implementation("dev.kord:kord-core:0.10.0")
-    implementation("dev.kord:kord-voice:0.10.0")
-    implementation("dev.kord:kord-core-voice:0.10.0")
     // Lavalink
     implementation("dev.schlaubi.lavakord:kord:7.0.3")
     // Logging
@@ -40,7 +38,6 @@ dependencies {
     implementation("io.insert-koin:koin-annotations:1.3.0")
     ksp("io.insert-koin:koin-ksp-compiler:1.3.0")
 
-    implementation(kotlin("reflect"))
     implementation("io.github.classgraph:classgraph:4.8.165")
 }
 

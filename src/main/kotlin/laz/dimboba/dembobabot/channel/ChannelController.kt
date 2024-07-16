@@ -4,7 +4,7 @@ import dev.kord.core.event.message.MessageCreateEvent
 import laz.dimboba.dembobabot.controller.CommandAction
 import java.util.*
 
-@CommandAction("create-channel", "createchannel")
+@CommandAction("create-channel", ["create-channel", "createchannel"])
 suspend fun createChannel(args: List<String>, messageCreateEvent: MessageCreateEvent) =
     createChannelIfNotExist(
         name = args[2],
@@ -13,7 +13,7 @@ suspend fun createChannel(args: List<String>, messageCreateEvent: MessageCreateE
         serverGuild = messageCreateEvent.getGuildOrFail()
     )
 
-@CommandAction("delete-channel", "deletechannel")
+@CommandAction("delete-channel", ["delete-channel", "deletechannel"])
 suspend fun deleteChannel(args: List<String>, messageCreateEvent: MessageCreateEvent) =
     deleteChannelIfExist(
         name = args[2],
@@ -22,14 +22,14 @@ suspend fun deleteChannel(args: List<String>, messageCreateEvent: MessageCreateE
         serverGuild = messageCreateEvent.getGuildOrFail()
     )
 
-@CommandAction("create-category", "createcategory")
+@CommandAction("create-category", ["create-category", "createcategory"])
 suspend fun createCategory(args: List<String>, messageCreateEvent: MessageCreateEvent) =
     createCategoryIfNotExist(
         name = args[1],
         serverGuild = messageCreateEvent.getGuildOrFail()
     )
 
-@CommandAction("delete-category", "deletecategory")
+@CommandAction("delete-category", ["delete-category", "deletecategory"])
 suspend fun deleteCategory(args: List<String>, messageCreateEvent: MessageCreateEvent) =
     deleteCategoryIfExist(
         name = args[1],

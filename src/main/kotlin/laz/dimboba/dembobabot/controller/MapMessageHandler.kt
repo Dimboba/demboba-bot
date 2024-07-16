@@ -2,16 +2,17 @@ package laz.dimboba.dembobabot.controller
 
 import dev.kord.core.entity.Message
 import dev.kord.core.event.message.MessageCreateEvent
-import io.github.classgraph.ClassGraph
 import io.github.oshai.kotlinlogging.KotlinLogging
 import laz.dimboba.dembobabot.exceptions.NotACommandMessageException
 import laz.dimboba.dembobabot.exceptions.UnknownClassForCommandException
 import laz.dimboba.dembobabot.exceptions.UnknownCommandException
+import laz.dimboba.dembobabot.help.HelpController
 import laz.dimboba.dembobabot.voice.TrackScheduler
 import laz.dimboba.dembobabot.voice.TrackSchedulerProvider
 import org.koin.core.annotation.Singleton
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.koin.core.qualifier.named
 import java.lang.reflect.Method
 import java.lang.reflect.Modifier
 import kotlin.coroutines.Continuation
@@ -23,24 +24,18 @@ class MapMessageHandler : KoinComponent {
 
     private val commandMap: Map<String, Method>
     private val schedulerProvider: TrackSchedulerProvider by inject()
+    private val helpController: HelpController by inject()
+    private val annotatedMethods: List<Method> by inject(named("commandMethods"))
 
     private fun collectCommands(): Map<String, Method> {
         val annotation = CommandAction::class.java
-        return ClassGraph()
-            .ignoreClassVisibility()
-            .enableAllInfo()
-            .acceptPackages("laz.dimboba.dembobabot")
-            .scan(). use { scanResult ->
-                scanResult.getClassesWithMethodAnnotation(annotation)
-                    .flatMap { it.loadClass().declaredMethods.toList() }
-                    .filter { it.getAnnotation(annotation) != null}
-                    .flatMap {
-                        it.getAnnotation(annotation)
-                        .commands
-                        .map { command -> command.lowercase() to it } // don't know about lowercase
-                    }
-                    .toMap()
+        return annotatedMethods
+            .flatMap {
+                it.getAnnotation(annotation)
+                    .commands
+                    .map { command -> command.lowercase() to it } // don't know about lowercase
             }
+            .toMap()
     }
 
     init {
@@ -69,6 +64,7 @@ class MapMessageHandler : KoinComponent {
                 messageCreateEvent,
                 args
             )
+            HelpController::class.java -> method.invokeCommand(helpController, messageCreateEvent, args)
             else -> throw UnknownClassForCommandException(
                 "There is no handler for class ${method.declaringClass.canonicalName} " +
                 "required for command ${args[0]}")

@@ -36,7 +36,8 @@ suspend fun main(args: Array<String>) {
             VoiceModule().module,
             OverwatchModule().module,
             ControllerModule().module,
-            ChannelModule().module
+            ChannelModule().module,
+            HelpModule().module
         )
     }
 
@@ -51,7 +52,7 @@ suspend fun main(args: Array<String>) {
 //            messageHandler.handleMessage(this)
         } catch (ex: UnknownCommandException) {
             message.channel.createMessage(
-                "В Политехе такому не учили :<"
+                "They didn't teach that at PolyTech :<"
             )
             return@on
         } catch (ex: Exception) {
@@ -71,15 +72,5 @@ suspend fun main(args: Array<String>) {
         @OptIn(PrivilegedIntent::class)
         intents += Intent.GuildVoiceStates
     }
-}
-
-@CommandAction("hui", "pidor")
-fun hui() {
-    print("HUI")
-}
-
-@CommandAction()
-fun bitch() {
-    print("bitch")
 }
 
