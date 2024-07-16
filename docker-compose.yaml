@@ -11,7 +11,7 @@ services:
       # set lavalink server port
       - SERVER_PORT=2333
       # set password for lavalink
-      - LAVALINK_SERVER_PASSWORD=youshallnotpass
+      - LAVALINK_SERVER_PASSWORD=$LAVALINK_PASS
     volumes:
       # mount application.yml from the same directory or use environment variables
       - ./Lavalink/application.yml:/opt/Lavalink/application.yml

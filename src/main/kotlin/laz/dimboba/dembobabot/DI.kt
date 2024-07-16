@@ -19,7 +19,7 @@ class VoiceModule {
     @Singleton(createdAtStart = true)
     fun lavaKord(kord: Kord) = runBlocking {
         val lavakord = kord.lavakord()
-        lavakord.addNode("ws://localhost:2333", "youshallnotpass")
+        lavakord.addNode("ws://localhost:2333", System.getenv("LAVALINK_PASS"))
         return@runBlocking lavakord
 
     }
