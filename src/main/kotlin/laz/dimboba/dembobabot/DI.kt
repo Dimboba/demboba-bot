@@ -5,6 +5,7 @@ import dev.schlaubi.lavakord.kord.lavakord
 import io.github.classgraph.ClassGraph
 import kotlinx.coroutines.runBlocking
 import laz.dimboba.dembobabot.controller.CommandAction
+import laz.dimboba.dembobabot.exceptions.NoSystemVariableException
 import org.koin.core.annotation.ComponentScan
 import org.koin.core.annotation.Module
 import org.koin.core.annotation.Named
@@ -19,7 +20,8 @@ class VoiceModule {
     @Singleton(createdAtStart = true)
     fun lavaKord(kord: Kord) = runBlocking {
         val lavakord = kord.lavakord()
-        lavakord.addNode("ws://localhost:2333", System.getenv("LAVALINK_PASS"))
+        val pass = System.getenv("LAVALINK_PASS") ?: throw NoSystemVariableException("LAVALINK_PASS env required")
+        lavakord.addNode("ws://localhost:2333", pass)
         return@runBlocking lavakord
 
     }
@@ -41,7 +43,7 @@ class ChannelModule
 class MainModule {
     @Singleton
     fun kord(): Kord = runBlocking {
-        val token: String = System.getenv("discord_token") ?: "null-token"
+        val token: String = System.getenv("discord_token") ?: throw NoSystemVariableException("DISCORD_TOKEN env required")
         return@runBlocking Kord(token)
     }
     @Singleton(createdAtStart = true)
